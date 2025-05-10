@@ -112,13 +112,13 @@ namespace UnderCheat
             if (Game.Instance.Simulation.Zone.CurrentRoom.DoorState == Room.DoorStateType.Open)
             {
 
-                Debug.Log(UnderCheatBase.modGUID + ": Closing Doors");
+                Debug.Log($"{UnderCheatBase.modGUID}: Closing Doors");
                 Game.Instance.Simulation.Zone.CurrentRoom.CloseDoors();
             }
             else
             {
 
-                Debug.Log(UnderCheatBase.modGUID + ": Opening Doors");
+                Debug.Log($"{UnderCheatBase.modGUID}: Opening Doors");
                 Game.Instance.Simulation.Zone.CurrentRoom.OpenDoors();
             }
         }
@@ -134,12 +134,12 @@ namespace UnderCheat
                     {
                         if (playerInvincible) 
                         {
-                            Debug.Log(UnderCheatBase.modGUID + ": Disabling Infinite HP");
+                            Debug.Log($"{UnderCheatBase.modGUID}: Disabling Infinite HP");
                         }
                         else
                         {
                             extension.SetCurrentHP(extension.MaxHP);
-                            Debug.Log(UnderCheatBase.modGUID + ": Enabling Infinite HP");
+                            Debug.Log($"{UnderCheatBase.modGUID}: Enabling Infinite HP");
                         }
                         playerInvincible = !playerInvincible;
                     }
@@ -155,7 +155,7 @@ namespace UnderCheat
                 GameData.Instance.Discover((DataObject)itemData);
             }
 
-            Debug.Log(UnderCheatBase.modGUID + ": Unlocking All Items");
+            Debug.Log($"{UnderCheatBase.modGUID}: Unlocking All Items");
         }
 
         static void AddResource(string resource, int changeInt)
@@ -174,35 +174,35 @@ namespace UnderCheat
                                     case "key":
 
                                         extension.ChangeResource(GameData.Instance.KeyResource, changeInt, (List<string>)null, false, (Entity)null);
-                                        Debug.Log(UnderCheatBase.modGUID + ": Changed " + resource + " by " + changeInt + " from " + extension.GetResource(GameData.Instance.KeyResource));
+                                        Debug.Log($"{UnderCheatBase.modGUID}: Changed {resource} by {changeInt} from {extension.GetResource(GameData.Instance.KeyResource) - changeInt} to {extension.GetResource(GameData.Instance.KeyResource)}");
                                         break;
 
                                     case "bomb":
 
                                         extension.ChangeResource(GameData.Instance.BombResource, changeInt, (List<string>)null, false, (Entity)null);
-                                        Debug.Log(UnderCheatBase.modGUID + ": Changed " + resource + " by " + changeInt + " from " + extension.GetResource(GameData.Instance.BombResource));
-                                        break;
+                                    Debug.Log($"{UnderCheatBase.modGUID}: Changed {resource} by {changeInt} from {extension.GetResource(GameData.Instance.BombResource) - changeInt} to {extension.GetResource(GameData.Instance.BombResource)}");
+                                    break;
 
                                     case "gold":
 
                                         extension.ChangeResource(GameData.Instance.GoldResource, changeInt, (List<string>)null, false, (Entity)null);
-                                        Debug.Log(UnderCheatBase.modGUID + ": Changed " + resource + " by " + changeInt + " from " + extension.GetResource(GameData.Instance.GoldResource));
-                                        break;
+                                    Debug.Log($"{UnderCheatBase.modGUID}: Changed {resource} by {changeInt} from {extension.GetResource(GameData.Instance.GoldResource) - changeInt} to {extension.GetResource(GameData.Instance.GoldResource)}");
+                                    break;
 
                                     case "thorium":
 
                                         extension.ChangeResource(GameData.Instance.ThoriumResource, changeInt, (List<string>)null, false, (Entity)null);
-                                        Debug.Log(UnderCheatBase.modGUID + ": Changed " + resource + " by " + changeInt + " from " + extension.GetResource(GameData.Instance.ThoriumResource));
+                                        Debug.Log($"{UnderCheatBase.modGUID}: Changed {resource} by {changeInt} from {extension.GetResource(GameData.Instance.ThoriumResource) - changeInt} to {extension.GetResource(GameData.Instance.ThoriumResource)}");
                                         break;
 
                                     case "nether":
 
                                         extension.ChangeResource(GameData.Instance.NetherResource, changeInt, (List<string>)null, false, (Entity)null);
-                                        Debug.Log(UnderCheatBase.modGUID + ": Changed " + resource + " by " + changeInt + " from " + extension.GetResource(GameData.Instance.NetherResource));
+                                        Debug.Log($"{UnderCheatBase.modGUID}: Changed {resource} by {changeInt} from {extension.GetResource(GameData.Instance.NetherResource) - changeInt} to {extension.GetResource(GameData.Instance.NetherResource)}");
                                         break;
 
                                     default:
-                                        Debug.LogError(UnderCheatBase.modGUID + ": Error occured whilst changing '" + resource + "' count by `" + changeInt + "`");
+                                        Debug.LogError($"{UnderCheatBase.modGUID}: Error occured whilst changing '{resource}' count by `{changeInt}`");
                                         break;
                                 }
                             }
@@ -226,7 +226,7 @@ namespace UnderCheat
                     {
                         extension2.ChangeResource(GameData.Instance.XPResource, extension2.GetMaxResource(GameData.Instance.XPResource) - extension2.GetResource(GameData.Instance.XPResource), (List<string>)null, false, (Entity)null);
                     }
-                    Debug.Log(UnderCheatBase.modGUID + ": Set pet's level to max");
+                    Debug.Log($"{UnderCheatBase.modGUID}: Set pet's level to max");
                 }
             }
         }

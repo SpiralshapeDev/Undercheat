@@ -41,27 +41,27 @@ namespace UnderCheat
                                     InventoryExt extension1 = petSlot.pet.GetExtension<InventoryExt>();
                                     if (!UnityEngine.Object.Equals((UnityEngine.Object)extension1, (UnityEngine.Object)null))
                                     {
-                                        if (extension1.GetResource(GameData.Instance.XPResource) == extension1.GetMaxResource(GameData.Instance.XPResource)) { petText = "<color=red>Max Pet Level</color>"; }
+                                        if (extension1.GetResource(GameData.Instance.XPResource) == extension1.GetMaxResource(GameData.Instance.XPResource)) 
+                                        { 
+                                            petText = "<color=red>Max Pet Level</color>"; 
+                                        }
                                     }
                                 }
                             }
                         }
 
-                        // Player Invulnerability Text
-                        string invulnerabilityText = "Toggle Player Invulnerability";
-                        if (Cheats.playerInvincible) { invulnerabilityText = "<color=yellow>Toggle Player Invulnerability</color>"; }
                         // Set Text
-                        ((TMP_Text)TMP).text = "T: Toggle UI<br>F1: Switch To Page 2<br>F2: " + invulnerabilityText + " <br>F3: Toggle Closed doors<br>F4: Unlock All Items<br>F5: " + petText;
+                        ((TMP_Text)TMP).text = $"T: Toggle UI<br>F1: Switch To Page 2<br>F2: {(Cheats.playerInvincible ? "<color=yellow>" : "")}Toggle Player Invulnerability</color> <br>F3: Toggle Closed doors<br>F4: Unlock All Items<br>F5: {petText}";
                         break;
 
                     case false:
 
                         // Resource Texts
-                        string keyText = (keyAmount.ToString().Contains("-") ? "Removes " : "Adds ") + keyAmount + (keyAmount == 1 ? " key" : " keys"); // Ex: Adds 10 keys
-                        string bombText = (bombAmount.ToString().Contains("-") ? "Removes " : "Adds ") + bombAmount + (bombAmount == 1 ? " bomb" : " bombs");
-                        string goldText = (goldAmount.ToString().Contains("-") ? "Removes " : "Adds ") + goldAmount + " gold";
-                        string thoriumText = (thoriumAmount.ToString().Contains("-") ? "Removes " : "Adds ") + thoriumAmount + " thorium";
-                        string netherText = (netherAmount.ToString().Contains("-") ? "Removes " : "Adds ") + netherAmount + " nether";
+                        string keyText = (keyAmount.ToString().Contains("-") ? "Removes " : "Adds ") + Mathf.Abs(keyAmount) + (Mathf.Abs(keyAmount) == 1 ? " key" : " keys"); // Ex: Adds 10 keys
+                        string bombText = (bombAmount.ToString().Contains("-") ? "Removes " : "Adds ") + Mathf.Abs(bombAmount) + (Mathf.Abs(bombAmount) == 1 ? " bomb" : " bombs");
+                        string goldText = (goldAmount.ToString().Contains("-") ? "Removes " : "Adds ") + Mathf.Abs(goldAmount) + " gold";
+                        string thoriumText = (thoriumAmount.ToString().Contains("-") ? "Removes " : "Adds ") + Mathf.Abs(thoriumAmount) + " thorium";
+                        string netherText = (netherAmount.ToString().Contains("-") ? "Removes " : "Adds ") + Mathf.Abs(netherAmount) + " nether";
                         foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
                         {
                             if ((UnityEngine.Object)player.Avatar != null)
@@ -69,101 +69,52 @@ namespace UnderCheat
                                 InventoryExt extension2 = player.Avatar.GetExtension<InventoryExt>();
                                 
                                 // Show max resource quantity
-                                keyText += " (" + extension2.GetResource(GameData.Instance.KeyResource) + "/" + extension2.GetMaxResource(GameData.Instance.KeyResource) + ")";
-                                bombText += " (" + extension2.GetResource(GameData.Instance.BombResource) + "/" + extension2.GetMaxResource(GameData.Instance.BombResource) + ")";
-                                goldText += " (" + extension2.GetResource(GameData.Instance.GoldResource) + "/" + extension2.GetMaxResource(GameData.Instance.GoldResource) + ")";
-                                thoriumText += " (" + extension2.GetResource(GameData.Instance.ThoriumResource) + "/" + extension2.GetMaxResource(GameData.Instance.ThoriumResource) + ")";
-                                netherText += " (" + extension2.GetResource(GameData.Instance.NetherResource) + "/" + extension2.GetMaxResource(GameData.Instance.NetherResource) + ")";
-                                
+                                keyText += $" ({extension2.GetResource(GameData.Instance.KeyResource)}/{extension2.GetMaxResource(GameData.Instance.KeyResource)})</color>";
+                                bombText += $" ({extension2.GetResource(GameData.Instance.BombResource)}/{extension2.GetMaxResource(GameData.Instance.BombResource)})</color>";
+                                goldText += $" ({extension2.GetResource(GameData.Instance.GoldResource)}/{extension2.GetMaxResource(GameData.Instance.GoldResource)})</color>";
+                                thoriumText += $" ({extension2.GetResource(GameData.Instance.ThoriumResource)}/{extension2.GetMaxResource(GameData.Instance.ThoriumResource)})</color>";
+                                netherText += $" ({extension2.GetResource(GameData.Instance.NetherResource)}/{extension2.GetMaxResource(GameData.Instance.NetherResource)})</color>";
+
                                 //* Change text color if maxed
                                 // Key Resource
-                                if (keyAmount.ToString().Contains("-"))
+                                int keyOutputQuantity = extension2.GetResource(GameData.Instance.KeyResource) + keyAmount;
+                                if (keyOutputQuantity < extension2.GetMinResource(GameData.Instance.KeyResource) || keyOutputQuantity > extension2.GetMaxResource(GameData.Instance.KeyResource))
                                 {
-                                    if (extension2.GetResource(GameData.Instance.KeyResource) + keyAmount < extension2.GetMinResource(GameData.Instance.KeyResource))
-                                    {
-                                        keyText = "<color=red>" + keyText + "</color>";
-                                    }
-
+                                    keyText = "<color=red>" + keyText;
                                 }
-                                else
-                                {
-                                    if (extension2.GetResource(GameData.Instance.KeyResource) + keyAmount > extension2.GetMaxResource(GameData.Instance.KeyResource))
-                                    {
-                                        keyText = "<color=red>" + keyText + "</color>";
-                                    }
-                                } 
+
                                 // Bomb Resource
-                                if (bombAmount.ToString().Contains("-"))
+                                int bombOutputQuantity = extension2.GetResource(GameData.Instance.BombResource) + bombAmount;
+                                if (bombOutputQuantity < extension2.GetMinResource(GameData.Instance.BombResource) || bombOutputQuantity > extension2.GetMaxResource(GameData.Instance.BombResource))
                                 {
-                                    if (extension2.GetResource(GameData.Instance.BombResource) + bombAmount < extension2.GetMinResource(GameData.Instance.BombResource))
-                                    {
-                                        bombText = "<color=red>" + bombText + "</color>";
-                                    }
+                                    bombText = "<color=red>" + bombText;
+                                }
 
-                                }
-                                else
-                                {
-                                    if (extension2.GetResource(GameData.Instance.BombResource) + bombAmount > extension2.GetMaxResource(GameData.Instance.BombResource))
-                                    {
-                                        bombText = "<color=red>" + bombText + "</color>";
-                                    }
-                                }
-                                
                                 // Gold Resource
-                                if (goldAmount.ToString().Contains("-"))
+                                int goldOutputQuantity = extension2.GetResource(GameData.Instance.GoldResource) + goldAmount;
+                                if (goldOutputQuantity < extension2.GetMinResource(GameData.Instance.GoldResource) || goldOutputQuantity > extension2.GetMaxResource(GameData.Instance.GoldResource))
                                 {
-                                    if (extension2.GetResource(GameData.Instance.GoldResource) + goldAmount < extension2.GetMinResource(GameData.Instance.GoldResource))
-                                    {
-                                        goldText = "<color=red>" + goldText + "</color>";
-                                    }
+                                    goldText = "<color=red>" + goldText;
+                                }
 
-                                }
-                                else
-                                {
-                                    if (extension2.GetResource(GameData.Instance.GoldResource) + goldAmount > extension2.GetMaxResource(GameData.Instance.GoldResource))
-                                    {
-                                        goldText = "<color=red>" + goldText + "</color>";
-                                    }
-                                }
-                                
                                 // Thorium Resource
-                                if (thoriumAmount.ToString().Contains("-"))
+                                int thoriumOutputQuantity = extension2.GetResource(GameData.Instance.ThoriumResource) + thoriumAmount;
+                                if (thoriumOutputQuantity < extension2.GetMinResource(GameData.Instance.ThoriumResource) || thoriumOutputQuantity > extension2.GetMaxResource(GameData.Instance.ThoriumResource))
                                 {
-                                    if (extension2.GetResource(GameData.Instance.ThoriumResource) + thoriumAmount < extension2.GetMinResource(GameData.Instance.ThoriumResource))
-                                    {
-                                        thoriumText = "<color=red>" + thoriumText + "</color>";
-                                    }
+                                    thoriumText = "<color=red>" + thoriumText;
+                                }
 
-                                }
-                                else
-                                {
-                                    if (extension2.GetResource(GameData.Instance.ThoriumResource) + thoriumAmount > extension2.GetMaxResource(GameData.Instance.ThoriumResource))
-                                    {
-                                        thoriumText = "<color=red>" + thoriumText + "</color>";
-                                    }
-                                }
-                                
                                 // Nether Resource
-                                if (netherAmount.ToString().Contains("-"))
+                                int netherOutputQuantity = extension2.GetResource(GameData.Instance.NetherResource) + netherAmount;
+                                if (netherOutputQuantity < extension2.GetMinResource(GameData.Instance.NetherResource) || netherOutputQuantity > extension2.GetMaxResource(GameData.Instance.NetherResource))
                                 {
-                                    if (extension2.GetResource(GameData.Instance.NetherResource) + netherAmount < extension2.GetMinResource(GameData.Instance.NetherResource))
-                                    {
-                                        netherText = "<color=red>" + netherText + "</color>";
-                                    }
-
-                                }
-                                else
-                                {
-                                    if (extension2.GetResource(GameData.Instance.NetherResource) + netherAmount > extension2.GetMaxResource(GameData.Instance.NetherResource))
-                                    {
-                                        netherText = "<color=red>" + netherText + "</color>";
-                                    }
+                                    netherText = "<color=red>" + netherText;
                                 }
                             }
                         }
                         
                         // Set Text
-                        ((TMP_Text)TMP).text = "T: Toggle UI<br>F1: Switch To Page 1<br>F2: " + keyText + "<br>F3: " + bombText + "<br>F4: " + goldText + "<br>F5: " + thoriumText + "<br>F6: " + netherText;
+                        ((TMP_Text)TMP).text = $"T: Toggle UI<br>F1: Switch To Page 1<br>F2: {keyText}<br>F3: {bombText}<br>F4: {goldText}<br>F5: {thoriumText}<br>F6: {netherText}";
                         break;
 
                 }
@@ -172,18 +123,13 @@ namespace UnderCheat
             if (hidden) { ((TMP_Text)TMP).text = string.Empty; }
         }
 
-        private static string needS(int i, string str)
-        {
-            return i == 1 ? "" : "s";
-        }
-
         static void OnSpawnsAvatar(PlayerEvent playerEvent)
         {
             guiActive = true;
             // Create GUI
             canvas = GameObject.FindObjectOfType<Canvas>();
             GO = new GameObject();
-            GO.name = UnderCheatBase.modGUID + ".HackUI";
+            GO.name = $"{UnderCheatBase.modGUID}.HackUI";
 
             GO.transform.SetParent(canvas.transform);
             GO.AddComponent<RectTransform>();
@@ -196,13 +142,13 @@ namespace UnderCheat
             ((TMP_Text)TMP).font = TMP_FontAsset.CreateFontAsset(Font.CreateDynamicFontFromOSFont(Font.GetPathsToOSFonts()[0].ToString(), 16));
             ((TMP_Text)TMP).fontSize = 16f;
 
-            ((TMP_Text)TMP).text = "test";
+            ((TMP_Text)TMP).text = "";
             ((Graphic)TMP).color = Color.white;
             ((TMP_Text)TMP).overflowMode = (TextOverflowModes)0;
             ((Behaviour)TMP).enabled = true;
 
             // Show GUI
-            Debug.Log(UnderCheatBase.modGUID + ": Showing GUI");
+            Debug.Log($"{UnderCheatBase.modGUID}: Showing GUI");
             TMP.alpha = 1.0f;
 
             // Resource Add Amount Variables
@@ -222,7 +168,7 @@ namespace UnderCheat
             RT = null;
             page1 = true;
             guiActive = false;
-            Debug.Log(UnderCheatBase.modGUID + ": Hiding GUI");
+            Debug.Log($"{UnderCheatBase.modGUID}: Hiding GUI");
         }
 
         [HarmonyPatch(typeof(HUD))]
@@ -232,10 +178,10 @@ namespace UnderCheat
         {
             foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
             {
-                Debug.Log(UnderCheatBase.modGUID + ": Creating UI Events");
+                Debug.Log($"{UnderCheatBase.modGUID}: Creating UI Events");
                 player.RegisterEvent(PlayerEvent.EventType.SpawnsAvatar, OnSpawnsAvatar);
                 player.RegisterEvent(PlayerEvent.EventType.DestroysAvatar, OnDestroysAvatar);
-                Debug.Log(UnderCheatBase.modGUID + ": Done Creating UI Events");
+                Debug.Log($"{UnderCheatBase.modGUID}: Done Creating UI Events");
             }
         }
     }

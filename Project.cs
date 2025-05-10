@@ -11,7 +11,7 @@ namespace UnderCheat
     {
         public const string modGUID = "SpiralMods." + modName;
         private const string modName = "UnderCheat";
-        private const string modVersion = "1.0.6";
+        private const string modVersion = "1.0.7";
 
         private readonly Harmony harmony = new Harmony(modGUID);
 
@@ -36,7 +36,7 @@ namespace UnderCheat
 
             mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
 
-            mls.LogInfo(modName + " has loaded (ModVersion: " + modVersion + ", ModGUID: " + modGUID + ")!");
+            mls.LogInfo($"{modName} has loaded (ModVersion: {modVersion}, ModGUID: {modGUID})!");
 
             harmony.PatchAll(typeof(Cheats));
             harmony.PatchAll(typeof(HUDControl));
@@ -88,11 +88,11 @@ namespace UnderCheat
 
         void LogConfig()
         {
-            mls.LogInfo("Loaded Config amount for resource 'Key', Amount: '" + UnderCheatBase.KeyAmountAdd.Value.ToString() + "'");
-            mls.LogInfo("Loaded Config amount for resource 'Bomb', Amount: '" + UnderCheatBase.BombAmountAdd.Value.ToString() + "'");
-            mls.LogInfo("Loaded Config amount for resource 'Gold', Amount: '" + UnderCheatBase.GoldAmountAdd.Value.ToString() + "'");
-            mls.LogInfo("Loaded Config amount for resource 'Thorium', Amount: '" + UnderCheatBase.ThoriumAmountAdd.Value.ToString() + "'");
-            mls.LogInfo("Loaded Config amount for resource 'Nether', Amount: '" + UnderCheatBase.NetherAmountAdd.Value.ToString() + "'");
+            mls.LogInfo($"Loaded Config amount for resource 'Key', Amount: '{UnderCheatBase.KeyAmountAdd.Value}'");
+            mls.LogInfo($"Loaded Config amount for resource 'Bomb', Amount: '{UnderCheatBase.BombAmountAdd.Value}'");
+            mls.LogInfo($"Loaded Config amount for resource 'Gold', Amount: '{UnderCheatBase.GoldAmountAdd.Value}'");
+            mls.LogInfo($"Loaded Config amount for resource 'Thorium', Amount: '{UnderCheatBase.ThoriumAmountAdd.Value}'");
+            mls.LogInfo($"Loaded Config amount for resource 'Nether', Amount: '{UnderCheatBase.NetherAmountAdd.Value}'");
         }
 
         void Update()
