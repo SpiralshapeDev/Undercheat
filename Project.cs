@@ -3,6 +3,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
 using TMPro;
+using Undercheat;
 
 namespace UnderCheat
 {
@@ -11,7 +12,7 @@ namespace UnderCheat
     {
         public const string modGUID = "SpiralMods." + modName;
         private const string modName = "UnderCheat";
-        private const string modVersion = "1.0.7";
+        private const string modVersion = "1.0.8";
 
         private readonly Harmony harmony = new Harmony(modGUID);
 
@@ -40,6 +41,7 @@ namespace UnderCheat
 
             harmony.PatchAll(typeof(Cheats));
             harmony.PatchAll(typeof(HUDControl));
+            harmony.PatchAll(typeof(API));
             ConfigCreate();
         }
 

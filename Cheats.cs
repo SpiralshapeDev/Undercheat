@@ -1,8 +1,11 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
+using System;
 using Thor;
 using Rewired;
 using UnityEngine;
+using Undercheat;
+using System.Reflection;
 
 namespace UnderCheat
 {
@@ -12,11 +15,22 @@ namespace UnderCheat
     {
         public static bool playerInvincible = false;
         static Simulation sim;
+
+        static List<KeyCode> keyList = new List<KeyCode> {
+            KeyCode.T,
+            KeyCode.F1,
+            KeyCode.F2,
+            KeyCode.F3,
+            KeyCode.F4,
+            KeyCode.F5,
+            KeyCode.F6,
+            KeyCode.F7
+        };
+
         [HarmonyPatch("Update")]
         [HarmonyPostfix]
         static void patchUpdate()
         {
-            // Invincible Bool
             foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
             {
                 if ((UnityEngine.Object)player.Avatar != (UnityEngine.Object)null)
@@ -37,73 +51,147 @@ namespace UnderCheat
                     HUDControl.hidden = !HUDControl.hidden;
                 }
 
-                // Switch
-                switch (HUDControl.page1)
+                if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F1))
                 {
-                    /// Case True (Page 1)
-                    case true:
+                    API.current_page = API.next_page();
+                }
 
-                        if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F1))
-                        {
-                            HUDControl.page1 = !HUDControl.page1;
-                        }
+                bool cheat_key_down = false;
 
-                        if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F2))
-                        {
-                            SetInvulnerable();
-                        }
+                foreach(KeyCode key in keyList)
+                {
+                    if (ReInput.controllers.Keyboard.GetKeyDown(key))
+                    {
+                        cheat_key_down = true;
+                    }
+                }
 
-                        if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F3))
-                        {
-                            ToggleDoors();
-                        }
+                if (cheat_key_down)
+                {
+                    HUDControl.updateText();
+                    switch (API.current_page)
+                    {
+                        case 1:
 
-                        if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F4))
-                        {
-                            UnlockAll();
-                        }
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F2))
+                            {
+                                SetInvulnerable();
+                            }
 
-                        if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F5))
-                        {
-                            MaxPetLevel();
-                        }
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F3))
+                            {
+                                ToggleDoors();
+                            }
 
-                        break;
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F4))
+                            {
+                                UnlockAll();
+                            }
 
-                    /// Case False (Page 2)
-                    case false:
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F5))
+                            {
+                                MaxPetLevel();
+                            }
 
-                        if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F1))
-                        {
-                            HUDControl.page1 = !HUDControl.page1;
-                        }
+                            break;
 
-                        if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F2))
-                        {
-                            AddResource("key", UnderCheatBase.KeyAmountAdd.Value);
-                        }
+                        case 2:
 
-                        if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F3))
-                        {
-                            AddResource("bomb", UnderCheatBase.BombAmountAdd.Value);
-                        }
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F2))
+                            {
+                                AddResource("key", UnderCheatBase.KeyAmountAdd.Value);
+                            }
 
-                        if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F4))
-                        {
-                            AddResource("gold", UnderCheatBase.GoldAmountAdd.Value);
-                        }
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F3))
+                            {
+                                AddResource("bomb", UnderCheatBase.BombAmountAdd.Value);
+                            }
 
-                        if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F5))
-                        {
-                            AddResource("thorium", UnderCheatBase.ThoriumAmountAdd.Value);
-                        }
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F4))
+                            {
+                                AddResource("gold", UnderCheatBase.GoldAmountAdd.Value);
+                            }
 
-                        if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F6))
-                        {
-                            AddResource("nether", UnderCheatBase.NetherAmountAdd.Value);
-                        }
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F5))
+                            {
+                                AddResource("thorium", UnderCheatBase.ThoriumAmountAdd.Value);
+                            }
 
-                        break;
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F6))
+                            {
+                                AddResource("nether", UnderCheatBase.NetherAmountAdd.Value);
+                            }
+
+                            break;
+
+                        case 3:
+
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F2))
+                            {
+                                API.discover_tab_item_index = API.wrap_index(API.discover_tab_item_index - 1, API.Data.RelicCollection.Count);
+                            }
+
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F3))
+                            {
+                                API.discover_tab_item_index = API.wrap_index(API.discover_tab_item_index + 1, API.Data.RelicCollection.Count);
+                            }
+
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F4))
+                            {
+                                var item = API.GetItemDataIndex(API.discover_tab_item_index);
+                                if (item is ItemData itemData)
+                                {
+                                    foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
+                                    {
+                                        GameData.Instance.Discover(itemData);
+                                    }
+                                }
+                            }
+
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F5))
+                            {
+                                var item = API.GetItemDataIndex(API.discover_tab_item_index);
+                                if (item is ItemData itemData)
+                                {
+                                    foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
+                                    {
+                                        Entity relic = API.SpawnRelic(itemData, player.Avatar.Position);
+                                    }
+                                }
+                            }
+
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F6))
+                            {
+                                System.Random rand = new System.Random();
+
+                                var relics = API.Data.RelicCollection;
+                                int index = rand.Next(relics.Count);
+                                var randomItem = relics[index];
+                                if (randomItem is ItemData itemData)
+                                {
+                                    foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
+                                    {
+                                        Entity relic = API.SpawnRelic(itemData, player.Avatar.Position);
+                                    }
+                                }
+                            }
+
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F7))
+                            {
+                                foreach (var item in API.Data.RelicCollection)
+                                {
+                                    if (item is ItemData itemData)
+                                    {
+                                        foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
+                                        {
+                                            Entity relic = API.SpawnRelic(itemData, player.Avatar.Position);
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                    HUDControl.updateText();
                 }
             }
         }

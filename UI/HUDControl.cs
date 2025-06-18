@@ -3,6 +3,7 @@ using Thor;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine;
+using Undercheat;
 
 namespace UnderCheat
 {
@@ -13,7 +14,6 @@ namespace UnderCheat
         static GameObject GO;
         static TextMeshProUGUI TMP;
         static RectTransform RT;
-        public static bool page1 = true;
         public static bool hidden = false;
         public static bool guiActive = false;
         static int keyAmount = UnderCheatBase.KeyAmountAdd.Value;
@@ -21,17 +21,20 @@ namespace UnderCheat
         static int goldAmount = UnderCheatBase.GoldAmountAdd.Value;
         static int thoriumAmount = UnderCheatBase.ThoriumAmountAdd.Value;
         static int netherAmount = UnderCheatBase.NetherAmountAdd.Value;
+        public static GameData Data => GameData.Instance;
 
-        public static void Update()
+        public static void updateText()
         {
             if (GO && TMP)
             {
-                switch (page1)
+                string next_page_text = $"Next page ({Undercheat.API.next_page()})";
+                ((TMP_Text)TMP).text = $"T: Toggle UI<br>F1: {next_page_text}<br>";
+                switch (API.current_page)
                 {
-                    case true:
+                    case 1:
 
                         // Pet Text
-                        string petText = "Max Pet Level"; 
+                        string petText = "Max Pet Level";
                         foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
                         {
                             foreach (PetOwnerExt.PetSlot petSlot in player.Avatar.GetExtension<PetOwnerExt>().PetSlots)
@@ -41,9 +44,9 @@ namespace UnderCheat
                                     InventoryExt extension1 = petSlot.pet.GetExtension<InventoryExt>();
                                     if (!UnityEngine.Object.Equals((UnityEngine.Object)extension1, (UnityEngine.Object)null))
                                     {
-                                        if (extension1.GetResource(GameData.Instance.XPResource) == extension1.GetMaxResource(GameData.Instance.XPResource)) 
-                                        { 
-                                            petText = "<color=red>Max Pet Level</color>"; 
+                                        if (extension1.GetResource(GameData.Instance.XPResource) == extension1.GetMaxResource(GameData.Instance.XPResource))
+                                        {
+                                            petText = "<color=red>Max Pet Level</color>";
                                         }
                                     }
                                 }
@@ -51,10 +54,10 @@ namespace UnderCheat
                         }
 
                         // Set Text
-                        ((TMP_Text)TMP).text = $"T: Toggle UI<br>F1: Switch To Page 2<br>F2: {(Cheats.playerInvincible ? "<color=yellow>" : "")}Toggle Player Invulnerability</color> <br>F3: Toggle Closed doors<br>F4: Unlock All Items<br>F5: {petText}";
+                        ((TMP_Text)TMP).text += $"F2: {(Cheats.playerInvincible ? "<color=yellow>" : "")}Toggle Player Invulnerability</color> <br>F3: Toggle Closed doors<br>F4: Unlock All Items<br>F5: {petText}";
                         break;
 
-                    case false:
+                    case 2:
 
                         // Resource Texts
                         string keyText = (keyAmount.ToString().Contains("-") ? "Removes " : "Adds ") + Mathf.Abs(keyAmount) + (Mathf.Abs(keyAmount) == 1 ? " key" : " keys"); // Ex: Adds 10 keys
@@ -67,7 +70,7 @@ namespace UnderCheat
                             if ((UnityEngine.Object)player.Avatar != null)
                             {
                                 InventoryExt extension2 = player.Avatar.GetExtension<InventoryExt>();
-                                
+
                                 // Show max resource quantity
                                 keyText += $" ({extension2.GetResource(GameData.Instance.KeyResource)}/{extension2.GetMaxResource(GameData.Instance.KeyResource)})</color>";
                                 bombText += $" ({extension2.GetResource(GameData.Instance.BombResource)}/{extension2.GetMaxResource(GameData.Instance.BombResource)})</color>";
@@ -112,13 +115,37 @@ namespace UnderCheat
                                 }
                             }
                         }
-                        
+
                         // Set Text
-                        ((TMP_Text)TMP).text = $"T: Toggle UI<br>F1: Switch To Page 1<br>F2: {keyText}<br>F3: {bombText}<br>F4: {goldText}<br>F5: {thoriumText}<br>F6: {netherText}";
+                        ((TMP_Text)TMP).text += $"F2: {keyText}<br>F3: {bombText}<br>F4: {goldText}<br>F5: {thoriumText}<br>F6: {netherText}";
                         break;
 
+                    case 3:
+                        var item = API.GetItemDataIndex(API.discover_tab_item_index);
+                        if (item is ItemData itemData)
+                        {
+                            var previous_item = API.GetItemDataIndex(API.discover_tab_item_index - 1);
+                            var next_item = API.GetItemDataIndex(API.discover_tab_item_index + 1);
+
+                            string previous_text = $"{(previous_item == null ? "" : $"<color=grey>{API.CapitalizedSpace(previous_item.name)}</color> <- ")}";
+                            string next_text = $"{(next_item == null ? "" : $" -> <color=grey>{API.CapitalizedSpace(next_item.name)}</color>")}";
+
+                            string selected_item = $"{previous_text}{API.CapitalizedSpace(item.name)}{next_text}<br>";
+                            string previous_next = $"F2: Previous item<br>F3: Next item<br><br>";
+                            string discover_relic = $"{(itemData.IsDiscovered ? "<color=red>" : "")}F4: Discover {API.CapitalizedSpace(item.name)}</color><br>";
+                            string spawn_text = $"Spawn {API.CapitalizedSpace(itemData.name)} on player";
+                            string random_spawn_relic = $"Spawn a random relic on player";
+                            string spawn_all_relics = $"Spawn all relics on player";
+
+                            ((TMP_Text)TMP).text += $"{selected_item}{previous_next}{discover_relic}F5: {spawn_text}<br>F6: {random_spawn_relic}<br>F7: {spawn_all_relics}";
+                        }
+                        break;
                 }
             }
+        }
+
+        public static void Update()
+        {
             // Hide Text
             if (hidden) { ((TMP_Text)TMP).text = string.Empty; }
         }
@@ -149,6 +176,7 @@ namespace UnderCheat
 
             // Show GUI
             Debug.Log($"{UnderCheatBase.modGUID}: Showing GUI");
+            updateText();
             TMP.alpha = 1.0f;
 
             // Resource Add Amount Variables
@@ -166,7 +194,7 @@ namespace UnderCheat
             GO = null;
             TMP = null;
             RT = null;
-            page1 = true;
+            API.current_page = 1;
             guiActive = false;
             Debug.Log($"{UnderCheatBase.modGUID}: Hiding GUI");
         }
