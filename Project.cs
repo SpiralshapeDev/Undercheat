@@ -4,6 +4,7 @@ using HarmonyLib;
 using UnityEngine;
 using TMPro;
 using Undercheat;
+using System.Linq;
 
 namespace UnderCheat
 {
@@ -12,7 +13,7 @@ namespace UnderCheat
     {
         public const string modGUID = "SpiralMods." + modName;
         private const string modName = "UnderCheat";
-        private const string modVersion = "1.0.8";
+        private const string modVersion = "1.0.7.1";
 
         private readonly Harmony harmony = new Harmony(modGUID);
 
@@ -28,7 +29,20 @@ namespace UnderCheat
 
         void Awake()
         {
-            fontAsset = TMP_FontAsset.CreateFontAsset(Font.CreateDynamicFontFromOSFont(Font.GetOSInstalledFontNames()[0], 16));
+
+            string[] availableFonts = Font.GetOSInstalledFontNames();
+            if (availableFonts.Contains("Arial"))
+            {
+                Font dynamicFont = Font.CreateDynamicFontFromOSFont("Arial", 16);
+                fontAsset = TMP_FontAsset.CreateFontAsset(dynamicFont);
+                Logger.LogInfo("Loaded Arial font.");
+            }
+            else
+            {
+                Font dynamicFont = Font.CreateDynamicFontFromOSFont("Liberation Sans", 16);
+                fontAsset = TMP_FontAsset.CreateFontAsset(dynamicFont);
+                Logger.LogInfo("Loaded Liberation Sans font.");
+            }
 
             if (Instance == null)
             {

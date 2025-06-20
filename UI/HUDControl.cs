@@ -146,8 +146,13 @@ namespace UnderCheat
 
         public static void Update()
         {
-            // Hide Text
-            if (hidden) { ((TMP_Text)TMP).text = string.Empty; }
+            if (TMP != null)
+            {
+                if (hidden) 
+                { 
+                    ((TMP_Text)TMP).text = ""; 
+                }
+            }
         }
 
         static void OnSpawnsAvatar(PlayerEvent playerEvent)
@@ -166,7 +171,7 @@ namespace UnderCheat
             RT.anchoredPosition3D = new Vector3(-938.0f, 272.0f, 0.0f);
             RT.localScale = new Vector3(1.5f, 1.5f, 1.5f);
             ((Transform)RT).SetParent(TMP.transform);
-            ((TMP_Text)TMP).font = TMP_FontAsset.CreateFontAsset(Font.CreateDynamicFontFromOSFont(Font.GetPathsToOSFonts()[0].ToString(), 16));
+            ((TMP_Text)TMP).font = UnderCheatBase.fontAsset;
             ((TMP_Text)TMP).fontSize = 16f;
 
             ((TMP_Text)TMP).text = "";
@@ -176,8 +181,9 @@ namespace UnderCheat
 
             // Show GUI
             Debug.Log($"{UnderCheatBase.modGUID}: Showing GUI");
+            API.current_page = 1;
+            API.discover_tab_item_index = 0;
             updateText();
-            TMP.alpha = 1.0f;
 
             // Resource Add Amount Variables
             keyAmount = UnderCheatBase.KeyAmountAdd.Value;
@@ -196,6 +202,7 @@ namespace UnderCheat
             RT = null;
             API.current_page = 1;
             guiActive = false;
+            hidden = false;
             Debug.Log($"{UnderCheatBase.modGUID}: Hiding GUI");
         }
 
