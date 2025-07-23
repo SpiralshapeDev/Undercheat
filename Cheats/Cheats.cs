@@ -6,13 +6,14 @@ using Rewired;
 using UnityEngine;
 using Undercheat;
 using System.Reflection;
+using BepInEx.Configuration;
 
 namespace UnderCheat
 {
     [HarmonyPatch(typeof(Game))]
     internal class Cheats
     {
-        public static bool playerInvincible = false;
+        public static bool playerReducingDamage = false;
         static Simulation sim;
 
         static List<KeyCode> keyList = new List<KeyCode> {
@@ -31,17 +32,6 @@ namespace UnderCheat
         [HarmonyPostfix]
         static void patchUpdate()
         {
-            foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
-            {
-                if ((UnityEngine.Object)player.Avatar != (UnityEngine.Object)null)
-                {
-                    HealthExt extension = player.Avatar.GetExtension<HealthExt>();
-                    if ((UnityEngine.Object)extension != (UnityEngine.Object)null)
-                    {
-                        extension.Invulnerable = playerInvincible;
-                    }
-                }
-            }
             // Allow Hacks Only When Needed
             if (HUDControl.guiActive && !sim.IsPaused)
             {
@@ -75,7 +65,8 @@ namespace UnderCheat
 
                             if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F2))
                             {
-                                SetInvulnerable();
+                                playerReducingDamage = !playerReducingDamage;
+                                Debug.Log($"{UnderCheatBase.modGUID}: {(playerReducingDamage ? "Enabling" : "Disabling")} player damage reducer.");
                             }
 
                             if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F3))
@@ -91,6 +82,16 @@ namespace UnderCheat
                             if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F5))
                             {
                                 MaxPetLevel();
+                            }
+
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F6))
+                            {
+                                UnderCheatBase.Instance.reloadConfig();
+                                Debug.Log("Refreshing config...");
+                            }
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F7))
+                            {
+                                ConfigOpener.OpenConfig($"{UnderCheatBase.modGUID}.cfg");
                             }
 
                             break;
@@ -240,30 +241,6 @@ namespace UnderCheat
             }
         }
 
-        static void SetInvulnerable()
-        {
-            foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
-            {
-                if ((UnityEngine.Object)player.Avatar != (UnityEngine.Object)null)
-                {
-                    HealthExt extension = player.Avatar.GetExtension<HealthExt>();
-                    if ((UnityEngine.Object)extension != (UnityEngine.Object)null)
-                    {
-                        if (playerInvincible) 
-                        {
-                            Debug.Log($"{UnderCheatBase.modGUID}: Disabling Infinite HP");
-                        }
-                        else
-                        {
-                            extension.SetCurrentHP(extension.MaxHP);
-                            Debug.Log($"{UnderCheatBase.modGUID}: Enabling Infinite HP");
-                        }
-                        playerInvincible = !playerInvincible;
-                    }
-                }
-            }
-        }
-
         static void UnlockAll()
         {
             foreach (ItemData itemData in GameData.Instance.Items)
@@ -347,20 +324,6 @@ namespace UnderCheat
                 }
             }
         }
-        static void OnDestroysAvatar(PlayerEvent playerEvent)
-        {
-            foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
-            {
-                if ((UnityEngine.Object)player.Avatar != (UnityEngine.Object)null)
-                {
-                    HealthExt extension = player.Avatar.GetExtension<HealthExt>();
-                    if ((UnityEngine.Object)extension != (UnityEngine.Object)null)
-                    {
-                        playerInvincible = extension.Invulnerable;
-                    }
-                }
-            }
-        }
 
         [HarmonyPatch(typeof(Game))]
         [HarmonyPatch("Awake")]
@@ -369,16 +332,6 @@ namespace UnderCheat
         {
             sim = ___m_simulation;
 
-        }
-        [HarmonyPatch(typeof(HUD))]
-        [HarmonyPatch("Initialize")]
-        [HarmonyPostfix]
-        private static void Initialize()
-        {
-            foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
-            {
-                player.RegisterEvent(PlayerEvent.EventType.DestroysAvatar, OnDestroysAvatar);
-            }
         }
     }
 }

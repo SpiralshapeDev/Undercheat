@@ -1,10 +1,8 @@
 ﻿using HarmonyLib;
 using Thor;
 using TMPro;
-using UnityEngine.UI;
 using UnityEngine;
 using Undercheat;
-using static Rewired.ComponentControls.Effects.RotateAroundAxis;
 
 namespace UnderCheat
 {
@@ -25,6 +23,7 @@ namespace UnderCheat
         static int goldAmount = UnderCheatBase.GoldAmountAdd.Value;
         static int thoriumAmount = UnderCheatBase.ThoriumAmountAdd.Value;
         static int netherAmount = UnderCheatBase.NetherAmountAdd.Value;
+        static float damageReduce = UnderCheatBase.DamageReduceHackPercentage.Value;
         public static GameData Data => GameData.Instance;
 
         public static void updateText()
@@ -35,6 +34,8 @@ namespace UnderCheat
             TextMeshProUGUI TMP = textGO.GetComponent<TextMeshProUGUI>();
 
             string next_page_text = $"Next page ({Undercheat.API.next_page()})";
+            string config_text;
+            bool hideHints = UnderCheatBase.HideConfigHints.Value;
             TMP.text = $"T: Toggle UI<br>F1: {next_page_text}<br>";
             switch (API.current_page)
             {
@@ -60,8 +61,8 @@ namespace UnderCheat
                         }
                     }
 
-                    // Set Text
-                    TMP.text += $"F2: {(Cheats.playerInvincible ? "<color=yellow>" : "")}Toggle Player Invulnerability</color> <br>F3: Toggle Closed doors<br>F4: Unlock All Items<br>F5: {petText}";
+                    config_text = (hideHints ? "" : "<br><color=#c3c3c3>> Damage reducer amount can be edited in mod's config <<br>> Hints can also be disabled <</color>");
+                    TMP.text += $"F2: {(Cheats.playerReducingDamage ? "<color=yellow>" : "")}Toggle Player Damage Reducer ({damageReduce}%)</color>{config_text}<br>F3: Toggle Closed doors<br>F4: Unlock All Items<br>F5: {petText}<br>F6: Refresh Config<br>F7: Open Config File";
                     break;
 
                 case 2:
@@ -124,8 +125,8 @@ namespace UnderCheat
                     }
 
                     // Set Text
-                    string config_text = "<color=#c3c3c3>> Amounts can be edited in mod's configs <</color>";
-                    TMP.text += $"F2: {keyText}<br>F3: {bombText}<br>F4: {goldText}<br>F5: {thoriumText}<br>F6: {netherText}<br>{config_text}";
+                    config_text = (hideHints ? "" : "<br><color=#c3c3c3>> Amounts can be edited in mod's config <<br>> Hints can also be disabled <</color>");
+                    TMP.text += $"F2: {keyText}<br>F3: {bombText}<br>F4: {goldText}<br>F5: {thoriumText}<br>F6: {netherText}{config_text}";
                     break;
 
                 case 3:
@@ -154,6 +155,13 @@ namespace UnderCheat
 
         public static void Update()
         {
+            keyAmount = UnderCheatBase.KeyAmountAdd.Value;
+            bombAmount = UnderCheatBase.BombAmountAdd.Value;
+            goldAmount = UnderCheatBase.GoldAmountAdd.Value;
+            thoriumAmount = UnderCheatBase.ThoriumAmountAdd.Value;
+            netherAmount = UnderCheatBase.NetherAmountAdd.Value;
+            damageReduce = UnderCheatBase.DamageReduceHackPercentage.Value;
+
             if (textGO == null) { return; }
             TextMeshProUGUI TMP = textGO.GetComponent<TextMeshProUGUI>();
             if (TMP == null) { return; }
