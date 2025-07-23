@@ -71,13 +71,23 @@ namespace Undercheat
             return null;
         }
 
-        public static void PrintRelicList()
+        public static void PrintRelicList(bool discoveredOnly)
         {
             foreach (var item in Data.RelicCollection)
             {
                 if (item is ItemData itemData)
                 {
-                    mls.LogInfo($"Relic: {itemData.name}");
+                    if (discoveredOnly)
+                    {
+                        if (itemData.IsDiscovered)
+                        {
+                            mls.LogInfo($"Relic: {itemData.name}");
+                        } 
+                    }
+                    else
+                    {
+                        mls.LogInfo($"Relic: {itemData.name}");
+                    }
                 }
             }
         }

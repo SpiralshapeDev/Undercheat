@@ -9,7 +9,6 @@ using System.Reflection;
 
 namespace UnderCheat
 {
-
     [HarmonyPatch(typeof(Game))]
     internal class Cheats
     {
@@ -24,7 +23,8 @@ namespace UnderCheat
             KeyCode.F4,
             KeyCode.F5,
             KeyCode.F6,
-            KeyCode.F7
+            KeyCode.F7,
+            KeyCode.F8
         };
 
         [HarmonyPatch("Update")]
@@ -178,16 +178,14 @@ namespace UnderCheat
 
                             if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F7))
                             {
-                                foreach (var item in API.Data.RelicCollection)
-                                {
-                                    if (item is ItemData itemData)
-                                    {
-                                        foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
-                                        {
-                                            Entity relic = API.SpawnRelic(itemData, player.Avatar.Position);
-                                        }
-                                    }
-                                }
+                                bool discoveredOnly = false;
+                                SummonAllRelics(discoveredOnly);
+                            }
+
+                            if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F8))
+                            {
+                                bool discoveredOnly = true;
+                                SummonAllRelics(discoveredOnly);
                             }
                             break;
                     }
@@ -195,17 +193,48 @@ namespace UnderCheat
                 }
             }
         }
+
+        static void SummonAllRelics(bool discoveredOnly)
+        {
+            Debug.Log($"{UnderCheatBase.modGUID}: Attempting to spawn all {(discoveredOnly ? "discovered" : "")} relics.");
+            int spawned_relic_count = 0;
+            foreach (var item in API.Data.RelicCollection)
+            {
+                if (item is ItemData itemData)
+                {
+                    void SpawnRelic()
+                    {
+                        foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
+                        {
+                            Entity relic = API.SpawnRelic(itemData, player.Avatar.Position);
+                            spawned_relic_count++;
+                        }
+                    }
+
+                    if (discoveredOnly)
+                    {
+                        if (itemData.IsDiscovered)
+                        {
+                            SpawnRelic();
+                        }
+                    } else
+                    {
+                        SpawnRelic();
+                    }
+                }
+            }
+            Debug.Log($"{UnderCheatBase.modGUID}: Successfully spawned {spawned_relic_count} relics.");
+        }
+
         static void ToggleDoors()
         {
             if (Game.Instance.Simulation.Zone.CurrentRoom.DoorState == Room.DoorStateType.Open)
             {
-
                 Debug.Log($"{UnderCheatBase.modGUID}: Closing Doors");
                 Game.Instance.Simulation.Zone.CurrentRoom.CloseDoors();
             }
             else
             {
-
                 Debug.Log($"{UnderCheatBase.modGUID}: Opening Doors");
                 Game.Instance.Simulation.Zone.CurrentRoom.OpenDoors();
             }

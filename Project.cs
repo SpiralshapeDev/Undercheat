@@ -13,7 +13,7 @@ namespace UnderCheat
     {
         public const string modGUID = "SpiralMods." + modName;
         private const string modName = "UnderCheat";
-        private const string modVersion = "1.0.8.1";
+        private const string modVersion = "1.0.9";
 
         private readonly Harmony harmony = new Harmony(modGUID);
 
@@ -29,20 +29,19 @@ namespace UnderCheat
 
         void Awake()
         {
-
+            Font font;
             string[] availableFonts = Font.GetOSInstalledFontNames();
             if (availableFonts.Contains("Arial"))
             {
-                Font dynamicFont = Font.CreateDynamicFontFromOSFont("Arial", 16);
-                fontAsset = TMP_FontAsset.CreateFontAsset(dynamicFont);
+                font = Font.CreateDynamicFontFromOSFont("Arial", 16);
                 Logger.LogInfo("Loaded Arial font.");
             }
             else
             {
-                Font dynamicFont = Font.CreateDynamicFontFromOSFont("Liberation Sans", 16);
-                fontAsset = TMP_FontAsset.CreateFontAsset(dynamicFont);
+                font = Font.CreateDynamicFontFromOSFont("Liberation Sans", 16);
                 Logger.LogInfo("Loaded Liberation Sans font.");
             }
+            fontAsset = TMP_FontAsset.CreateFontAsset(font);
 
             if (Instance == null)
             {
