@@ -35,6 +35,12 @@ namespace UnderCheat
 
             string next_page_text = $"Next page ({Undercheat.API.next_page()})";
             string config_text;
+            keyAmount = UnderCheatBase.KeyAmountAdd.Value;
+            bombAmount = UnderCheatBase.BombAmountAdd.Value;
+            goldAmount = UnderCheatBase.GoldAmountAdd.Value;
+            thoriumAmount = UnderCheatBase.ThoriumAmountAdd.Value;
+            netherAmount = UnderCheatBase.NetherAmountAdd.Value;
+            damageReduce = UnderCheatBase.DamageReduceHackPercentage.Value;
             bool hideHints = UnderCheatBase.HideConfigHints.Value;
             TMP.text = $"T: Toggle UI<br>F1: {next_page_text}<br>";
             switch (API.current_page)
@@ -88,35 +94,35 @@ namespace UnderCheat
 
                             //* Change text color if maxed
                             // Key Resource
-                            int keyOutputQuantity = extension2.GetResource(GameData.Instance.KeyResource) + keyAmount;
+                            int keyOutputQuantity = extension2.GetResource(GameData.Instance.KeyResource) + (1 * (keyAmount > 0 ? 1 : -1));
                             if (keyOutputQuantity < extension2.GetMinResource(GameData.Instance.KeyResource) || keyOutputQuantity > extension2.GetMaxResource(GameData.Instance.KeyResource))
                             {
                                 keyText = "<color=red>" + keyText;
                             }
 
                             // Bomb Resource
-                            int bombOutputQuantity = extension2.GetResource(GameData.Instance.BombResource) + bombAmount;
+                            int bombOutputQuantity = extension2.GetResource(GameData.Instance.BombResource) + (1 * (bombAmount > 0 ? 1 : -1));
                             if (bombOutputQuantity < extension2.GetMinResource(GameData.Instance.BombResource) || bombOutputQuantity > extension2.GetMaxResource(GameData.Instance.BombResource))
                             {
                                 bombText = "<color=red>" + bombText;
                             }
 
                             // Gold Resource
-                            int goldOutputQuantity = extension2.GetResource(GameData.Instance.GoldResource) + goldAmount;
+                            int goldOutputQuantity = extension2.GetResource(GameData.Instance.GoldResource) + (1 * (goldAmount > 0 ? 1 : -1));
                             if (goldOutputQuantity < extension2.GetMinResource(GameData.Instance.GoldResource) || goldOutputQuantity > extension2.GetMaxResource(GameData.Instance.GoldResource))
                             {
                                 goldText = "<color=red>" + goldText;
                             }
 
                             // Thorium Resource
-                            int thoriumOutputQuantity = extension2.GetResource(GameData.Instance.ThoriumResource) + thoriumAmount;
+                            int thoriumOutputQuantity = extension2.GetResource(GameData.Instance.ThoriumResource) + (1 * (thoriumAmount > 0 ? 1 : -1));
                             if (thoriumOutputQuantity < extension2.GetMinResource(GameData.Instance.ThoriumResource) || thoriumOutputQuantity > extension2.GetMaxResource(GameData.Instance.ThoriumResource))
                             {
                                 thoriumText = "<color=red>" + thoriumText;
                             }
 
                             // Nether Resource
-                            int netherOutputQuantity = extension2.GetResource(GameData.Instance.NetherResource) + netherAmount;
+                            int netherOutputQuantity = extension2.GetResource(GameData.Instance.NetherResource) + (1 * (netherAmount > 0 ? 1 : -1));
                             if (netherOutputQuantity < extension2.GetMinResource(GameData.Instance.NetherResource) || netherOutputQuantity > extension2.GetMaxResource(GameData.Instance.NetherResource))
                             {
                                 netherText = "<color=red>" + netherText;
@@ -155,13 +161,6 @@ namespace UnderCheat
 
         public static void Update()
         {
-            keyAmount = UnderCheatBase.KeyAmountAdd.Value;
-            bombAmount = UnderCheatBase.BombAmountAdd.Value;
-            goldAmount = UnderCheatBase.GoldAmountAdd.Value;
-            thoriumAmount = UnderCheatBase.ThoriumAmountAdd.Value;
-            netherAmount = UnderCheatBase.NetherAmountAdd.Value;
-            damageReduce = UnderCheatBase.DamageReduceHackPercentage.Value;
-
             if (textGO == null) { return; }
             TextMeshProUGUI TMP = textGO.GetComponent<TextMeshProUGUI>();
             if (TMP == null) { return; }
@@ -173,6 +172,25 @@ namespace UnderCheat
                         rest_position,
                         Time.deltaTime * lerp_speed
                     );
+            }
+
+            foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
+            {
+                if ((UnityEngine.Object)player.Avatar != null)
+                {
+                    InventoryExt extension2 = player.Avatar.GetExtension<InventoryExt>();
+
+                    bool keyMissmatched = extension2.GetResource(GameData.Instance.KeyResource) != keyAmount;
+                    bool bombMissmatched = extension2.GetResource(GameData.Instance.KeyResource) != bombAmount;
+                    bool goldMissmatched = extension2.GetResource(GameData.Instance.KeyResource) != goldAmount;
+                    bool thoriumMissmatched = extension2.GetResource(GameData.Instance.KeyResource) != thoriumAmount;
+                    bool netherMissmatched = extension2.GetResource(GameData.Instance.KeyResource) != netherAmount;
+
+                    if (keyMissmatched || bombMissmatched || goldMissmatched || thoriumMissmatched || netherMissmatched)
+                    {
+                        updateText();
+                    }
+                }
             }
 
             if (hidden) 

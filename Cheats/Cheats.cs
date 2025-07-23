@@ -179,14 +179,14 @@ namespace UnderCheat
 
                             if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F7))
                             {
-                                bool discoveredOnly = false;
-                                SummonAllRelics(discoveredOnly);
+                                bool discoveredAndUnlockedOnly = false;
+                                SummonAllRelics(discoveredAndUnlockedOnly);
                             }
 
                             if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F8))
                             {
-                                bool discoveredOnly = true;
-                                SummonAllRelics(discoveredOnly);
+                                bool discoveredAndUnlockedOnly = true;
+                                SummonAllRelics(discoveredAndUnlockedOnly);
                             }
                             break;
                     }
@@ -195,9 +195,9 @@ namespace UnderCheat
             }
         }
 
-        static void SummonAllRelics(bool discoveredOnly)
+        static void SummonAllRelics(bool discoveredAndUnlockedOnly)
         {
-            Debug.Log($"{UnderCheatBase.modGUID}: Attempting to spawn all {(discoveredOnly ? "discovered" : "")} relics.");
+            Debug.Log($"{UnderCheatBase.modGUID}: Attempting to spawn all {(discoveredAndUnlockedOnly ? "discovered" : "")} relics.");
             int spawned_relic_count = 0;
             foreach (var item in API.Data.RelicCollection)
             {
@@ -212,9 +212,9 @@ namespace UnderCheat
                         }
                     }
 
-                    if (discoveredOnly)
+                    if (discoveredAndUnlockedOnly)
                     {
-                        if (itemData.IsDiscovered)
+                        if (itemData.IsDiscovered && itemData.IsUnlocked)
                         {
                             SpawnRelic();
                         }

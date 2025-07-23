@@ -13,7 +13,7 @@ namespace UnderCheat
     {
         public const string modGUID = "SpiralMods." + modName;
         private const string modName = "UnderCheat";
-        private const string modVersion = "1.1";
+        private const string modVersion = "1.1.1";
 
         private readonly Harmony harmony = new Harmony(modGUID);
 
