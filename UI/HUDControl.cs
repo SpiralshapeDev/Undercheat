@@ -46,29 +46,35 @@ namespace UnderCheat
             switch (API.current_page)
             {
                 case 1:
-
-                    // Pet Text
+                    bool damageBoost = false;
                     string petText = "Max Pet Level";
                     foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
                     {
-                        foreach (PetOwnerExt.PetSlot petSlot in player.Avatar.GetExtension<PetOwnerExt>().PetSlots)
+                        if ((UnityEngine.Object)player.Avatar != null)
                         {
-                            if (!UnityEngine.Object.Equals((UnityEngine.Object)petSlot.pet, (UnityEngine.Object)null))
+                            damageBoost = player.Avatar.HasModifier("CheatDamageMelee");
+                            foreach (PetOwnerExt.PetSlot petSlot in player.Avatar.GetExtension<PetOwnerExt>().PetSlots)
                             {
-                                InventoryExt extension1 = petSlot.pet.GetExtension<InventoryExt>();
-                                if (!UnityEngine.Object.Equals((UnityEngine.Object)extension1, (UnityEngine.Object)null))
+                                if (!UnityEngine.Object.Equals((UnityEngine.Object)petSlot.pet, (UnityEngine.Object)null))
                                 {
-                                    if (extension1.GetResource(GameData.Instance.XPResource) == extension1.GetMaxResource(GameData.Instance.XPResource))
+                                    InventoryExt extension1 = petSlot.pet.GetExtension<InventoryExt>();
+                                    if (!UnityEngine.Object.Equals((UnityEngine.Object)extension1, (UnityEngine.Object)null))
                                     {
-                                        petText = "<color=red>Max Pet Level</color>";
+                                        if (extension1.GetResource(GameData.Instance.XPResource) == extension1.GetMaxResource(GameData.Instance.XPResource))
+                                        {
+                                            petText = "<color=red>Max Pet Level</color>";
+                                        }
                                     }
                                 }
                             }
                         }
                     }
 
+                    string damage_reducer = $"F2: {(Cheats.playerReducingDamage ? "<color=yellow>" : "")}Toggle Damage Reducer ({damageReduce}%)</color>";
+                    float damage_boost_amount = UnderCheatBase.DamageBoostAmount.Value;
+                    string damage_boost = $"F3: {(damageBoost ? "<color=yellow>" : "")}Toggle Attack Damage Booster ({(damage_boost_amount.ToString().Contains("-") ? $"{damage_boost_amount}" : $"+{damage_boost_amount}")} DMG)</color>";
                     config_text = (hideHints ? "" : "<br><color=#c3c3c3>> Damage reducer amount can be edited in mod's config <<br>> Hints can also be disabled <</color>");
-                    TMP.text += $"F2: {(Cheats.playerReducingDamage ? "<color=yellow>" : "")}Toggle Player Damage Reducer ({damageReduce}%)</color>{config_text}<br>F3: Toggle Closed doors<br>F4: Unlock All Items<br>F5: {petText}<br>F6: Refresh Config<br>F7: Open Config File";
+                    TMP.text += $"{damage_reducer}<br>{damage_boost}{config_text}<br>F4: Toggle Closed doors<br>F5: Unlock All Items<br>F6: {petText}<br>F7: Refresh Config<br>F8: Open Config File";
                     break;
 
                 case 2:
@@ -151,10 +157,14 @@ namespace UnderCheat
                         string spawn_text = $"Spawn {API.CapitalizedSpace(itemData.name)} on player";
                         string random_spawn_relic = $"Spawn a random relic on player";
                         string spawn_all_relics = $"Spawn all relics on player";
-                        string spawn_all_discovered_relics = $"Spawn all discovered relics on player";
+                        string spawn_all_discovered_relics = $"Spawn all unlocked relics on player";
 
                         TMP.text += $"{selected_item}{previous_next}{discover_relic}F5: {spawn_text}<br>F6: {random_spawn_relic}<br>F7: {spawn_all_relics}<br>F8: {spawn_all_discovered_relics}";
                     }
+                    break;
+
+                case 4:
+                    TMP.text += $"F2: Add random Minor curse<br>F3: Remove random Minor curse<br>F4: Add random Major curse<br>F5: Remove random Major curse";
                     break;
             }
         }

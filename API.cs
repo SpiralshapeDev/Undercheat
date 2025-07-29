@@ -19,7 +19,7 @@ namespace Undercheat
         public static Simulation Simulation => Game.Simulation;
 
         public static int min_page = 1;
-        public static int max_page = 3;
+        public static int max_page = 4;
         public static int current_page = min_page;
         public static int discover_tab_item_index = 0;
 
