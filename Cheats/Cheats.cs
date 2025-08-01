@@ -273,20 +273,29 @@ namespace UnderCheat
             {
                 if ((UnityEngine.Object)player.Avatar != (UnityEngine.Object)null)
                 {
-                    if (player.Avatar.HasModifier("CheatDamageMelee"))
+                    if (player.Avatar.HasModifier("CheatMeleeDamage"))
                     {
-                        player.Avatar.RemoveModifier("CheatDamageMelee");
+                        player.Avatar.RemoveModifier("CheatMeleeDamage");
+                        player.Avatar.RemoveModifier("CheatMeleeSpeed");
                         player.Avatar.RemoveModifier("CheatDamageThrow");
                     }
                     else
                     {
                         player.Avatar.AddModifier(new Modifier()
                         {
-                            id = "CheatDamageMelee",
+                            id = "CheatMeleeDamage",
                             typeName = "Thor.DamageExt",
                             memberName = "damageCategory1",
                             operatorName = Modifier.Assign.name,
                             floatAmount = UnderCheatBase.DamageBoostAmount.Value
+                        });
+                        player.Avatar.AddModifier(new Modifier()
+                        {
+                            id = "CheatMeleeSpeed",
+                            typeName = "Thor.DamageExt",
+                            memberName = "AttackSpeed",
+                            operatorName = Modifier.Assign.name,
+                            floatAmount = UnderCheatBase.DamageAttackSpeed.Value
                         });
                         player.Avatar.AddModifier(new Modifier()
                         {

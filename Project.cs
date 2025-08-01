@@ -14,7 +14,7 @@ namespace UnderCheat
     {
         public const string modGUID = "SpiralMods." + modName;
         private const string modName = "UnderCheat";
-        private const string modVersion = "1.2";
+        private const string modVersion = "1.2.1";
 
         private readonly Harmony harmony = new Harmony(modGUID);
 
@@ -28,7 +28,7 @@ namespace UnderCheat
 
         public static BepInEx.Configuration.ConfigEntry<int> KeyAmountAdd, BombAmountAdd, GoldAmountAdd, ThoriumAmountAdd, NetherAmountAdd;
 
-        public static BepInEx.Configuration.ConfigEntry<float> DamageReduceHackPercentage, DamageBoostAmount;
+        public static BepInEx.Configuration.ConfigEntry<float> DamageReduceHackPercentage, DamageBoostAmount, DamageAttackSpeed;
 
         void Awake()
         {
@@ -73,6 +73,7 @@ namespace UnderCheat
             UnderCheatBase.NetherAmountAdd = this.Config.Bind<int>("Settings", "Amount of Nether added", 1, "Changes the amount of nether given in the resource cheat.");
             UnderCheatBase.DamageReduceHackPercentage = this.Config.Bind<float>("Settings", "Percentage of damage reduced", 100, "Amount of damage reduced in damage reducing hack.");
             UnderCheatBase.DamageBoostAmount = this.Config.Bind<float>("Settings", "Damage Boost Amount", 999, "Amount of damage added in damage boosting hack.");
+            UnderCheatBase.DamageAttackSpeed = this.Config.Bind<float>("Settings", "Attack Speed Boost Amount", 2, "(default ingame is 1) Range (0.1 to 5) Attack speed in damage boosting hack.");
             LogConfig();
         }
 
@@ -84,8 +85,9 @@ namespace UnderCheat
             mls.LogInfo($"Loaded Config for resource 'Gold', Value: '{UnderCheatBase.GoldAmountAdd.Value}'");
             mls.LogInfo($"Loaded Config for resource 'Thorium', Value: '{UnderCheatBase.ThoriumAmountAdd.Value}'");
             mls.LogInfo($"Loaded Config for resource 'Nether', Value: '{UnderCheatBase.NetherAmountAdd.Value}'");
-            mls.LogInfo($"Loaded Config for damage reduce hack percentage, Value: '{UnderCheatBase.DamageReduceHackPercentage.Value}%'");
+            mls.LogInfo($"Loaded Config for damage reduce percentage, Value: '{UnderCheatBase.DamageReduceHackPercentage.Value}%'");
             mls.LogInfo($"Loaded Config for damage boost hack, Value: '{UnderCheatBase.DamageBoostAmount.Value}'");
+            mls.LogInfo($"Loaded Config for attack speed boost amount, Value: '{UnderCheatBase.DamageBoostAmount.Value}'");
         }
 
         void Update()
@@ -101,7 +103,7 @@ namespace UnderCheat
             {
                 if ((UnityEngine.Object)player.Avatar != (UnityEngine.Object)null)
                 {
-                    if (player.Avatar.HasModifier("CheatDamageMelee"))
+                    if (player.Avatar.HasModifier("CheatMeleeDamage"))
                     {
                         Cheats.CheatDamage();
                         Cheats.CheatDamage();

@@ -52,7 +52,7 @@ namespace UnderCheat
                     {
                         if ((UnityEngine.Object)player.Avatar != null)
                         {
-                            damageBoost = player.Avatar.HasModifier("CheatDamageMelee");
+                            damageBoost = player.Avatar.HasModifier("CheatMeleeDamage");
                             foreach (PetOwnerExt.PetSlot petSlot in player.Avatar.GetExtension<PetOwnerExt>().PetSlots)
                             {
                                 if (!UnityEngine.Object.Equals((UnityEngine.Object)petSlot.pet, (UnityEngine.Object)null))
