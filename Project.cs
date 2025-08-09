@@ -1,11 +1,12 @@
 ﻿using BepInEx;
-using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
 using TMPro;
 using Undercheat;
 using System.Linq;
 using Thor;
+using UnderCheat.UI;
+using UnderCheat.Cheats;
 
 namespace UnderCheat
 {
@@ -14,13 +15,11 @@ namespace UnderCheat
     {
         public const string modGUID = "SpiralMods." + modName;
         private const string modName = "UnderCheat";
-        private const string modVersion = "1.2.1";
+        private const string modVersion = "1.2.2";
 
         private readonly Harmony harmony = new Harmony(modGUID);
 
         public static UnderCheatBase Instance;
-
-        internal ManualLogSource mls;
 
         public static TMP_FontAsset fontAsset;
 
@@ -37,12 +36,12 @@ namespace UnderCheat
             if (availableFonts.Contains("Arial"))
             {
                 font = Font.CreateDynamicFontFromOSFont("Arial", 16);
-                Logger.LogInfo("Loaded Arial font.");
+                Debug.Log($"{UnderCheatBase.modGUID}: Loaded Arial font.");
             }
             else
             {
                 font = Font.CreateDynamicFontFromOSFont("Liberation Sans", 16);
-                Logger.LogInfo("Loaded Liberation Sans font.");
+                Debug.Log($"{UnderCheatBase.modGUID}: Loaded Liberation Sans font.");
             }
             fontAsset = TMP_FontAsset.CreateFontAsset(font);
 
@@ -51,11 +50,9 @@ namespace UnderCheat
                 Instance = this;
             }
 
-            mls = BepInEx.Logging.Logger.CreateLogSource(modGUID);
+            Debug.Log($"{UnderCheatBase.modGUID}: {modName} has loaded (ModVersion: {modVersion}, ModGUID: {modGUID})!");
 
-            mls.LogInfo($"{modName} has loaded (ModVersion: {modVersion}, ModGUID: {modGUID})!");
-
-            harmony.PatchAll(typeof(Cheats));
+            harmony.PatchAll(typeof(CheatManager));
             harmony.PatchAll(typeof(HUDControl));
             harmony.PatchAll(typeof(API));
             harmony.PatchAll(typeof(Damage));
@@ -79,15 +76,15 @@ namespace UnderCheat
 
         void LogConfig()
         {
-            mls.LogInfo($"Loaded Config for hint hiding, Value: '{UnderCheatBase.HideConfigHints.Value}'");
-            mls.LogInfo($"Loaded Config for resource 'Key', Value: '{UnderCheatBase.KeyAmountAdd.Value}'");
-            mls.LogInfo($"Loaded Config for resource 'Bomb', Value: '{UnderCheatBase.BombAmountAdd.Value}'");
-            mls.LogInfo($"Loaded Config for resource 'Gold', Value: '{UnderCheatBase.GoldAmountAdd.Value}'");
-            mls.LogInfo($"Loaded Config for resource 'Thorium', Value: '{UnderCheatBase.ThoriumAmountAdd.Value}'");
-            mls.LogInfo($"Loaded Config for resource 'Nether', Value: '{UnderCheatBase.NetherAmountAdd.Value}'");
-            mls.LogInfo($"Loaded Config for damage reduce percentage, Value: '{UnderCheatBase.DamageReduceHackPercentage.Value}%'");
-            mls.LogInfo($"Loaded Config for damage boost hack, Value: '{UnderCheatBase.DamageBoostAmount.Value}'");
-            mls.LogInfo($"Loaded Config for attack speed boost amount, Value: '{UnderCheatBase.DamageBoostAmount.Value}'");
+            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for hint hiding, Value: '{UnderCheatBase.HideConfigHints.Value}'");
+            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for resource 'Key', Value: '{UnderCheatBase.KeyAmountAdd.Value}'");
+            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for resource 'Bomb', Value: '{UnderCheatBase.BombAmountAdd.Value}'");
+            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for resource 'Gold', Value: '{UnderCheatBase.GoldAmountAdd.Value}'");
+            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for resource 'Thorium', Value: '{UnderCheatBase.ThoriumAmountAdd.Value}'");
+            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for resource 'Nether', Value: '{UnderCheatBase.NetherAmountAdd.Value}'");
+            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for damage reduce percentage, Value: '{UnderCheatBase.DamageReduceHackPercentage.Value}%'");
+            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for damage boost hack, Value: '{UnderCheatBase.DamageBoostAmount.Value}'");
+            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for attack speed boost amount, Value: '{UnderCheatBase.DamageBoostAmount.Value}'");
         }
 
         void Update()
@@ -105,8 +102,8 @@ namespace UnderCheat
                 {
                     if (player.Avatar.HasModifier("CheatMeleeDamage"))
                     {
-                        Cheats.CheatDamage();
-                        Cheats.CheatDamage();
+                        CheatManager.CheatDamage();
+                        CheatManager.CheatDamage();
                     }
                 }
             }

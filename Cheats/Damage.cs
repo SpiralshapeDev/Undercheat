@@ -1,40 +1,36 @@
 ﻿using HarmonyLib;
 using Thor;
 using UnityEngine;
-using Undercheat;
 
-namespace UnderCheat
+namespace UnderCheat.Cheats
 {
     [HarmonyPatch(typeof(HealthExt), nameof(HealthExt.ChangeHP))]
     public class Damage
     {
         static void Prefix(HealthExt __instance, ref HealthExt.ChangeHPArgs args)
         {
-            bool is_player = false;
+            bool isPlayer = false;
             foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
             {
-                if ((UnityEngine.Object)player.Avatar != (UnityEngine.Object)null)
-                {
-                    if (player.Avatar == __instance.Entity)
-                    {
-                        is_player = true;
-                    }
-                }
+                if (!(UnityEngine.Object)player.Avatar) break;
+                if (player.Avatar != __instance.Entity) break;
+                
+                isPlayer = true;
             }
 
-            if (is_player)
+            if (isPlayer)
             {
-                if (Cheats.playerReducingDamage)
+                if (CheatManager.playerReducingDamage)
                 {
-                    float percentage_multiplier = (100 - UnderCheatBase.DamageReduceHackPercentage.Value) / 100;
-                    float result = args.delta * percentage_multiplier;
-                    int delta_out = (int)Mathf.Round(result);
+                    float percentageMultiplier = (100 - UnderCheatBase.DamageReduceHackPercentage.Value) / 100;
+                    float result = args.delta * percentageMultiplier;
+                    int deltaOut = (int)Mathf.Round(result);
 
-                    Debug.Log($"{UnderCheatBase.modGUID}: Reduced player incoming damage by {args.delta - delta_out}");
+                    Debug.Log($"{UnderCheatBase.modGUID}: Reduced player incoming damage by {args.delta - deltaOut}");
 
                     if (args.delta < 0)
                     {
-                        args.delta = delta_out;
+                        args.delta = deltaOut;
                     }
                 }
 

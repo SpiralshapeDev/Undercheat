@@ -1,8 +1,4 @@
-﻿using BepInEx.Logging;
-using HarmonyLib;
-using Rewired;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Thor;
@@ -14,12 +10,11 @@ namespace Undercheat
     internal class API
     {
         public static GameData Data => GameData.Instance;
-        internal static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource(UnderCheatBase.modGUID);
-        public static Game Game => Game.Instance;
-        public static Simulation Simulation => Game.Simulation;
+        private static Game Game => Game.Instance;
+        private static Simulation Simulation => Game.Simulation;
 
-        public static int min_page = 1;
-        public static int max_page = 4;
+        static int min_page = 1;
+        static int max_page = 4;
         public static int current_page = min_page;
         public static int discover_tab_item_index = 0;
 
@@ -81,12 +76,12 @@ namespace Undercheat
                     {
                         if (itemData.IsDiscovered)
                         {
-                            mls.LogInfo($"Relic: {itemData.name}");
+                            Debug.Log($"{UnderCheatBase.modGUID}: Relic: {itemData.name}");
                         } 
                     }
                     else
                     {
-                        mls.LogInfo($"Relic: {itemData.name}");
+                        Debug.Log($"{UnderCheatBase.modGUID}: Relic: {itemData.name}");
                     }
                 }
             }
@@ -99,21 +94,21 @@ namespace Undercheat
             {
                 if (data == null)
                 {
-                    mls.LogWarning("Item's Data cannot be null!");
+                    Debug.LogWarning($"{UnderCheatBase.modGUID}: Item's Data cannot be null!");
                     return null;
                 }
 
                 var prefab = Data?.GetItemTemplate(data);
                 if (prefab == null)
                 {
-                    mls.LogWarning("Could not find item template for: " + data?.name);
+                    Debug.LogWarning($"{UnderCheatBase.modGUID}: Could not find item template for: " + data?.name);
                     return null;
                 }
 
                 using (new ItemExt.ItemDataScope(data))
                 {
                     var entity = Simulation.SpawnEntity(prefab, position, Quaternion.identity, -1, null);
-                    mls.LogInfo($"Created new relic with name : `{data.name}`");
+                    Debug.Log($"{UnderCheatBase.modGUID}: Created new relic with name : `{data.name}`");
                     var mover = entity.GetExtension<MoverExt>();
                     if (mover == null)
                         return entity;
@@ -128,7 +123,7 @@ namespace Undercheat
             }
             catch (Exception e)
             {
-                mls.LogError("Error occurred while spawning relic: " + e);
+                Debug.LogError($"{UnderCheatBase.modGUID}: Error occurred while spawning relic: " + e);
                 return null;
             }
         }
@@ -137,14 +132,13 @@ namespace Undercheat
             var dataObject = Data.RelicCollection.FirstOrDefault(i => i.name.Equals(name, StringComparison.OrdinalIgnoreCase));
             if (dataObject == null)
             {
-                mls.LogWarning($"Item with name '{name}' not found.");
+                Debug.LogWarning($"{UnderCheatBase.modGUID}: Item with name '{name}' not found.");
                 return null;
             }
 
-            if (dataObject is ItemData itemData)
-                return itemData;
+            if (dataObject is ItemData itemData) { return itemData; }
 
-            mls.LogWarning($"DataObject '{name}' is not an ItemData.");
+            Debug.LogWarning($"{UnderCheatBase.modGUID}: DataObject '{name}' is not an ItemData.");
             return null;
         }
     }

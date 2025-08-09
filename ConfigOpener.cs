@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using System.Diagnostics;
 using System.IO;
+using Debug = UnityEngine.Debug;
 
 namespace UnderCheat
 {
@@ -12,7 +13,7 @@ namespace UnderCheat
 
             if (!File.Exists(configPath))
             {
-                UnityEngine.Debug.LogError($"Config file not found at {configPath}");
+                Debug.LogError($"{UnderCheatBase.modGUID}: Config file not found at {configPath}");
                 return;
             }
 
@@ -26,7 +27,7 @@ namespace UnderCheat
             }
             catch (System.Exception ex)
             {
-                UnityEngine.Debug.LogError($"Failed to open config file: {ex}");
+                Debug.LogError($"{UnderCheatBase.modGUID}: Failed to open config file: {ex}");
             }
         }
     }
