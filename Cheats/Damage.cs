@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using Thor;
 using UnityEngine;
 
@@ -20,13 +20,13 @@ namespace UnderCheat.Cheats
 
             if (isPlayer)
             {
-                if (CheatManager.playerReducingDamage)
+                if (CheatManager.PlayerReducingDamage)
                 {
                     float percentageMultiplier = (100 - UnderCheatBase.DamageReduceHackPercentage.Value) / 100;
                     float result = args.delta * percentageMultiplier;
                     int deltaOut = (int)Mathf.Round(result);
 
-                    Debug.Log($"{UnderCheatBase.modGUID}: Reduced player incoming damage by {args.delta - deltaOut}");
+                    Debug.Log($"{UnderCheatBase.ModGuid}: Reduced player incoming damage by {args.delta - deltaOut}");
 
                     if (args.delta < 0)
                     {

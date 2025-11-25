@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Thor;
 using UnderCheat;
 using UnityEngine;
+using BepInEx;
 
 namespace Undercheat
 {
@@ -13,18 +14,20 @@ namespace Undercheat
         private static Game Game => Game.Instance;
         private static Simulation Simulation => Game.Simulation;
 
-        static int min_page = 1;
-        static int max_page = 4;
-        public static int current_page = min_page;
-        public static int discover_tab_item_index = 0;
+        static readonly int MinPage = 1;
+        static readonly int MaxPage = 4;
+        public static int CurrentPage = MinPage;
+        public static int DiscoverTabItemIndex = 0;
+        
+        public static bool IsProton = BepInEx.Paths.ConfigPath.Contains("Z:\\");
 
         public static int next_page()
         {
-            int page = current_page;
+            int page = CurrentPage;
             page++;
-            if (max_page < page || min_page > page)
+            if (MaxPage < page || MinPage > page)
             {
-                page = min_page;
+                page = MinPage;
             }
             return page;
         }
@@ -48,9 +51,9 @@ namespace Undercheat
             return result;
         }
 
-        public static int wrap_index(int index, int max_index)
+        public static int wrap_index(int index, int maxIndex)
         {
-            return ((index % max_index) + max_index) % max_index;
+            return ((index % maxIndex) + maxIndex) % maxIndex;
         }
 
         public static ItemData GetItemDataIndex(int index)
@@ -70,19 +73,17 @@ namespace Undercheat
         {
             foreach (var item in Data.RelicCollection)
             {
-                if (item is ItemData itemData)
+                if (!(item is ItemData itemData)) { break; }
+                
+                if (discoveredOnly)
                 {
-                    if (discoveredOnly)
-                    {
-                        if (itemData.IsDiscovered)
-                        {
-                            Debug.Log($"{UnderCheatBase.modGUID}: Relic: {itemData.name}");
-                        } 
-                    }
-                    else
-                    {
-                        Debug.Log($"{UnderCheatBase.modGUID}: Relic: {itemData.name}");
-                    }
+                    if (!itemData.IsDiscovered) { break; }
+                    
+                    Debug.Log($"{UnderCheatBase.ModGuid}: Relic: {itemData.name}");
+                }
+                else
+                {
+                    Debug.Log($"{UnderCheatBase.ModGuid}: Relic: {itemData.name}");
                 }
             }
         }
@@ -94,21 +95,21 @@ namespace Undercheat
             {
                 if (data == null)
                 {
-                    Debug.LogWarning($"{UnderCheatBase.modGUID}: Item's Data cannot be null!");
+                    Debug.LogWarning($"{UnderCheatBase.ModGuid}: Item's Data cannot be null!");
                     return null;
                 }
 
-                var prefab = Data?.GetItemTemplate(data);
+                var prefab = Data.GetItemTemplate(data);
                 if (prefab == null)
                 {
-                    Debug.LogWarning($"{UnderCheatBase.modGUID}: Could not find item template for: " + data?.name);
+                    Debug.LogWarning($"{UnderCheatBase.ModGuid}: Could not find item template for: " + data.name);
                     return null;
                 }
 
                 using (new ItemExt.ItemDataScope(data))
                 {
                     var entity = Simulation.SpawnEntity(prefab, position, Quaternion.identity, -1, null);
-                    Debug.Log($"{UnderCheatBase.modGUID}: Created new relic with name : `{data.name}`");
+                    Debug.Log($"{UnderCheatBase.ModGuid}: Created new relic with name : `{data.name}`");
                     var mover = entity.GetExtension<MoverExt>();
                     if (mover == null)
                         return entity;
@@ -123,7 +124,7 @@ namespace Undercheat
             }
             catch (Exception e)
             {
-                Debug.LogError($"{UnderCheatBase.modGUID}: Error occurred while spawning relic: " + e);
+                Debug.LogError($"{UnderCheatBase.ModGuid}: Error occurred while spawning relic: " + e);
                 return null;
             }
         }
@@ -132,13 +133,13 @@ namespace Undercheat
             var dataObject = Data.RelicCollection.FirstOrDefault(i => i.name.Equals(name, StringComparison.OrdinalIgnoreCase));
             if (dataObject == null)
             {
-                Debug.LogWarning($"{UnderCheatBase.modGUID}: Item with name '{name}' not found.");
+                Debug.LogWarning($"{UnderCheatBase.ModGuid}: Item with name '{name}' not found.");
                 return null;
             }
 
             if (dataObject is ItemData itemData) { return itemData; }
 
-            Debug.LogWarning($"{UnderCheatBase.modGUID}: DataObject '{name}' is not an ItemData.");
+            Debug.LogWarning($"{UnderCheatBase.ModGuid}: DataObject '{name}' is not an ItemData.");
             return null;
         }
     }

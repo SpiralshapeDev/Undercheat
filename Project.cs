@@ -4,30 +4,37 @@ using UnityEngine;
 using TMPro;
 using Undercheat;
 using System.Linq;
+using BepInEx.Configuration;
 using Thor;
 using UnderCheat.UI;
 using UnderCheat.Cheats;
 
 namespace UnderCheat
 {
-    [BepInPlugin(modGUID, modName, modVersion)]
+    [BepInPlugin(ModGuid, ModName, ModVersion)]
     public class UnderCheatBase : BaseUnityPlugin
     {
-        public const string modGUID = "SpiralMods." + modName;
-        private const string modName = "UnderCheat";
-        private const string modVersion = "1.2.2";
+        public const string ModGuid = "SpiralMods." + ModName;
+        private const string ModName = "UnderCheat";
+        private const string ModVersion = "1.2.3";
 
-        private readonly Harmony harmony = new Harmony(modGUID);
+        private readonly Harmony _harmony = new Harmony(ModGuid);
 
         public static UnderCheatBase Instance;
 
-        public static TMP_FontAsset fontAsset;
+        public static TMP_FontAsset FontAsset;
 
-        public static BepInEx.Configuration.ConfigEntry<bool> HideConfigHints;
+        public static ConfigEntry<bool> HideConfigHints;
 
-        public static BepInEx.Configuration.ConfigEntry<int> KeyAmountAdd, BombAmountAdd, GoldAmountAdd, ThoriumAmountAdd, NetherAmountAdd;
+        public static ConfigEntry<int> KeyAmountAdd;
+        public static ConfigEntry<int> BombAmountAdd;
+        public static ConfigEntry<int> GoldAmountAdd;
+        public static ConfigEntry<int> ThoriumAmountAdd;
+        public static ConfigEntry<int> NetherAmountAdd;
 
-        public static BepInEx.Configuration.ConfigEntry<float> DamageReduceHackPercentage, DamageBoostAmount, DamageAttackSpeed;
+        public static ConfigEntry<float> DamageReduceHackPercentage;
+        public static ConfigEntry<float> DamageBoostAmount;
+        public static ConfigEntry<float> DamageAttackSpeed;
 
         void Awake()
         {
@@ -36,26 +43,26 @@ namespace UnderCheat
             if (availableFonts.Contains("Arial"))
             {
                 font = Font.CreateDynamicFontFromOSFont("Arial", 16);
-                Debug.Log($"{UnderCheatBase.modGUID}: Loaded Arial font.");
+                Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Arial font.");
             }
             else
             {
                 font = Font.CreateDynamicFontFromOSFont("Liberation Sans", 16);
-                Debug.Log($"{UnderCheatBase.modGUID}: Loaded Liberation Sans font.");
+                Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Liberation Sans font.");
             }
-            fontAsset = TMP_FontAsset.CreateFontAsset(font);
+            FontAsset = TMP_FontAsset.CreateFontAsset(font);
 
             if (Instance == null)
             {
                 Instance = this;
             }
 
-            Debug.Log($"{UnderCheatBase.modGUID}: {modName} has loaded (ModVersion: {modVersion}, ModGUID: {modGUID})!");
+            Debug.Log($"{UnderCheatBase.ModGuid}: {ModName} has loaded (ModVersion: {ModVersion}, ModGUID: {ModGuid})!");
 
-            harmony.PatchAll(typeof(CheatManager));
-            harmony.PatchAll(typeof(HUDControl));
-            harmony.PatchAll(typeof(API));
-            harmony.PatchAll(typeof(Damage));
+            _harmony.PatchAll(typeof(CheatManager));
+            _harmony.PatchAll(typeof(HUDControl));
+            _harmony.PatchAll(typeof(API));
+            _harmony.PatchAll(typeof(Damage));
             ConfigCreate();
         }
 
@@ -76,15 +83,15 @@ namespace UnderCheat
 
         void LogConfig()
         {
-            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for hint hiding, Value: '{UnderCheatBase.HideConfigHints.Value}'");
-            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for resource 'Key', Value: '{UnderCheatBase.KeyAmountAdd.Value}'");
-            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for resource 'Bomb', Value: '{UnderCheatBase.BombAmountAdd.Value}'");
-            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for resource 'Gold', Value: '{UnderCheatBase.GoldAmountAdd.Value}'");
-            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for resource 'Thorium', Value: '{UnderCheatBase.ThoriumAmountAdd.Value}'");
-            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for resource 'Nether', Value: '{UnderCheatBase.NetherAmountAdd.Value}'");
-            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for damage reduce percentage, Value: '{UnderCheatBase.DamageReduceHackPercentage.Value}%'");
-            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for damage boost hack, Value: '{UnderCheatBase.DamageBoostAmount.Value}'");
-            Debug.Log($"{UnderCheatBase.modGUID}: Loaded Config for attack speed boost amount, Value: '{UnderCheatBase.DamageBoostAmount.Value}'");
+            Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Config for hint hiding, Value: '{UnderCheatBase.HideConfigHints.Value}'");
+            Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Config for resource 'Key', Value: '{UnderCheatBase.KeyAmountAdd.Value}'");
+            Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Config for resource 'Bomb', Value: '{UnderCheatBase.BombAmountAdd.Value}'");
+            Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Config for resource 'Gold', Value: '{UnderCheatBase.GoldAmountAdd.Value}'");
+            Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Config for resource 'Thorium', Value: '{UnderCheatBase.ThoriumAmountAdd.Value}'");
+            Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Config for resource 'Nether', Value: '{UnderCheatBase.NetherAmountAdd.Value}'");
+            Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Config for damage reduce percentage, Value: '{UnderCheatBase.DamageReduceHackPercentage.Value}%'");
+            Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Config for damage boost hack, Value: '{UnderCheatBase.DamageBoostAmount.Value}'");
+            Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Config for attack speed boost amount, Value: '{UnderCheatBase.DamageBoostAmount.Value}'");
         }
 
         void Update()
@@ -92,20 +99,17 @@ namespace UnderCheat
             HUDControl.Update();
         }
 
-        public void reloadConfig()
+        public void ReloadConfig()
         {
             Config.Reload();
 
             foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
             {
-                if ((UnityEngine.Object)player.Avatar != (UnityEngine.Object)null)
-                {
-                    if (player.Avatar.HasModifier("CheatMeleeDamage"))
-                    {
-                        CheatManager.CheatDamage();
-                        CheatManager.CheatDamage();
-                    }
-                }
+                if (!(UnityEngine.Object)player.Avatar) { break; }
+                if (!player.Avatar.HasModifier("CheatMeleeDamage")) { break; }
+
+                CheatManager.CheatDamage();
+                CheatManager.CheatDamage();
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using Thor;
 using TMPro;
 using Undercheat;
@@ -10,29 +10,30 @@ namespace UnderCheat.UI
     public class HUDControl
     {
         // Variables
-        static Canvas _canvas;
-        static GameObject GO;
-        static GameObject textGO;
-        static RectTransform RT;
-        static TextMeshProUGUI TMP;
-        public static bool Hidden = false;
-        public static bool GUIActive = false;
-        const float LerpSpeed = 4f;
-        static int _keyAmount = UnderCheatBase.KeyAmountAdd.Value;
-        static int _bombAmount = UnderCheatBase.BombAmountAdd.Value;
-        static int _goldAmount = UnderCheatBase.GoldAmountAdd.Value;
-        static int _thoriumAmount = UnderCheatBase.ThoriumAmountAdd.Value;
-        static int _netherAmount = UnderCheatBase.NetherAmountAdd.Value;
-        static float _damageReduce = UnderCheatBase.DamageReduceHackPercentage.Value;
+        private static Canvas _uiCanvas;
+        private static GameObject _gameObjectPanel;
+        private static GameObject _gameObjectText;
+        private static RectTransform _rectPanel;
+        private static TextMeshProUGUI _textPanel;
+        public static bool Hidden;
+        public static bool GUIActive;
+        private const float LerpSpeed = 4f;
+        private static int _keyAmount = UnderCheatBase.KeyAmountAdd.Value;
+        private static int _bombAmount = UnderCheatBase.BombAmountAdd.Value;
+        private static int _goldAmount = UnderCheatBase.GoldAmountAdd.Value;
+        private static int _thoriumAmount = UnderCheatBase.ThoriumAmountAdd.Value;
+        private static int _netherAmount = UnderCheatBase.NetherAmountAdd.Value;
+        private static float _damageReduce = UnderCheatBase.DamageReduceHackPercentage.Value;
         public static GameData Data => GameData.Instance;
         
-        private static Vector3 _restPosition = new Vector3(-938.0f, 272.0f, 0.0f);
-        private static Vector3 _restPositionOffset = new Vector3(-1250,0,0);
+        private static readonly Vector3 RestPosition = new Vector3(-938.0f, 272.0f, 0.0f);
+        private static readonly Vector3 RestPositionOffset = new Vector3(-1250,0,0);
 
         public static void UpdateText()
         {
-            if (!GO) { return; }
-            if (!textGO) { return; }
+            if (!_gameObjectPanel) { return; }
+            if (!_gameObjectText) { return; }
+            if (!_textPanel) { return; }
 
             string nextPageText = $"Next page ({Undercheat.API.next_page()})";
             string configText;
@@ -43,8 +44,8 @@ namespace UnderCheat.UI
             _netherAmount = UnderCheatBase.NetherAmountAdd.Value;
             _damageReduce = UnderCheatBase.DamageReduceHackPercentage.Value;
             bool hideHints = UnderCheatBase.HideConfigHints.Value;
-            TMP.text = $"T: Toggle UI<br>F1: {nextPageText}<br>";
-            switch (API.current_page)
+            _textPanel.text = $"T: Toggle UI<br>F1: {nextPageText}<br>";
+            switch (API.CurrentPage)
             {
                 case 1:
                     bool damageBoost = false;
@@ -69,11 +70,12 @@ namespace UnderCheat.UI
                         }
                     }
 
-                    string damageReducer = $"F2: {(CheatManager.playerReducingDamage ? "<color=yellow>" : "")}Toggle Damage Reducer ({_damageReduce}%)</color>";
+                    string damageReducer = $"F2: {(CheatManager.PlayerReducingDamage ? "<color=yellow>" : "")}Toggle Damage Reducer ({_damageReduce}%)</color>";
                     float damageBoostAmount = UnderCheatBase.DamageBoostAmount.Value;
                     string damageBoostText = $"F3: {(damageBoost ? "<color=yellow>" : "")}Toggle Attack Damage Booster ({(damageBoostAmount.ToString().Contains("-") ? $"{damageBoostAmount}" : $"+{damageBoostAmount}")} DMG)</color>";
                     configText = (hideHints ? "" : "<br><color=#c3c3c3>> Damage reducer amount can be edited in mod's config <<br>> Hints can also be disabled <</color>");
-                    TMP.text += $"{damageReducer}<br>{damageBoostText}{configText}<br>F4: Toggle Closed doors<br>F5: Unlock All Items<br>F6: {petText}<br>F7: Refresh Config<br>F8: Open Config File";
+                    string openConfigText = (API.IsProton ? "<color=red><s>" : "") + "Open Config File" + "</s></color>";
+                    _textPanel.text += $"{damageReducer}<br>{damageBoostText}{configText}<br>F4: Toggle Closed doors<br>F5: Unlock All Items<br>F6: {petText}<br>F7: Refresh Config<br>F8: {openConfigText}";
                     break;
 
                 case 2:
@@ -136,47 +138,50 @@ namespace UnderCheat.UI
 
                     // Set Text
                     configText = (hideHints ? "" : "<br><color=#c3c3c3>> Amounts can be edited in mod's config <<br>> Hints can also be disabled <</color>");
-                    TMP.text += $"F2: {keyText}<br>F3: {bombText}<br>F4: {goldText}<br>F5: {thoriumText}<br>F6: {netherText}{configText}";
+                    _textPanel.text += $"F2: {keyText}<br>F3: {bombText}<br>F4: {goldText}<br>F5: {thoriumText}<br>F6: {netherText}{configText}";
                     break;
 
                 case 3:
-                    var item = API.GetItemDataIndex(API.discover_tab_item_index);
-                    if (item is ItemData itemData)
-                    {
-                        var previousItem = API.GetItemDataIndex(API.discover_tab_item_index - 1);
-                        var nextItem = API.GetItemDataIndex(API.discover_tab_item_index + 1);
+                    var item = API.GetItemDataIndex(API.DiscoverTabItemIndex);
+                    if (!(item is ItemData itemData)) { break; }
+                    
+                    var previousItem = API.GetItemDataIndex(API.DiscoverTabItemIndex - 1);
+                    var nextItem = API.GetItemDataIndex(API.DiscoverTabItemIndex + 1);
+                    
+                    if (!previousItem) { break; }
+                    if (!nextItem) { break; }
 
-                        string previousText = $"<color=grey>{API.CapitalizedSpace(previousItem.name)}</color> <-";
-                        string nextText = $" -> <color=grey>{API.CapitalizedSpace(nextItem.name)}</color>";
+                    string previousText = $"<color=grey>{API.CapitalizedSpace(previousItem.name)}</color> <-";
+                    string nextText = $" -> <color=grey>{API.CapitalizedSpace(nextItem.name)}</color>";
 
-                        string selectedItem = $"{previousText}{API.CapitalizedSpace(item.name)}{nextText}<br>";
-                        string previousNext = $"F2: Previous item<br>F3: Next item<br><br>";
-                        string discoverRelic = $"{(itemData.IsDiscovered ? "<color=red>" : "")}F4: Discover {API.CapitalizedSpace(item.name)}</color><br>";
-                        string spawnText = $"Spawn {API.CapitalizedSpace(itemData.name)} on player";
-                        string randomSpawnRelic = $"Spawn a random relic on player";
-                        string spawnAllRelics = $"Spawn all relics on player";
-                        string spawnAllDiscoveredRelics = $"Spawn all unlocked relics on player";
+                    string selectedItem = $"{previousText}{API.CapitalizedSpace(item.name)}{nextText}<br>";
+                    string previousNext = $"F2: Previous item<br>F3: Next item<br><br>";
+                    string discoverRelic = $"{(itemData.IsDiscovered ? "<color=red>" : "")}F4: Discover {API.CapitalizedSpace(item.name)}</color><br>";
+                    string spawnText = $"Spawn {API.CapitalizedSpace(itemData.name)} on player";
+                    string randomSpawnRelic = $"Spawn a random relic on player";
+                    string spawnAllRelics = $"Spawn all relics on player";
+                    string spawnAllDiscoveredRelics = $"Spawn all unlocked relics on player";
 
-                        TMP.text += $"{selectedItem}{previousNext}{discoverRelic}F5: {spawnText}<br>F6: {randomSpawnRelic}<br>F7: {spawnAllRelics}<br>F8: {spawnAllDiscoveredRelics}";
-                    }
+                    _textPanel.text += $"{selectedItem}{previousNext}{discoverRelic}F5: {spawnText}<br>F6: {randomSpawnRelic}<br>F7: {spawnAllRelics}<br>F8: {spawnAllDiscoveredRelics}";
+
                     break;
 
                 case 4:
-                    TMP.text += $"F2: Add random Minor curse<br>F3: Remove random Minor curse<br>F4: Add random Major curse<br>F5: Remove random Major curse";
+                    _textPanel.text += $"F2: Add random Minor curse<br>F3: Remove random Minor curse<br>F4: Add random Major curse<br>F5: Remove random Major curse";
                     break;
             }
         }
 
         public static void Update()
         {
-            if (!textGO) { return; }
-            if (!TMP) { return; }
+            if (!_gameObjectText) { return; }
+            if (!_textPanel) { return; }
 
-            if (!Mathf.Approximately(Mathf.Round(RT.anchoredPosition3D.x), Mathf.Round(_restPosition.x)))
+            if (!Mathf.Approximately(Mathf.Round(_rectPanel.anchoredPosition3D.x), Mathf.Round(RestPosition.x)))
             {
-                RT.anchoredPosition3D = Vector3.Lerp(
-                        RT.anchoredPosition3D,
-                        _restPosition,
+                _rectPanel.anchoredPosition3D = Vector3.Lerp(
+                        _rectPanel.anchoredPosition3D,
+                        RestPosition,
                         Time.deltaTime * LerpSpeed
                     );
             }
@@ -197,40 +202,40 @@ namespace UnderCheat.UI
                 if (amountMismatched) { UpdateText(); }
             }
 
-            if (Hidden) { TMP.text = ""; }
+            if (Hidden) { _textPanel.text = ""; }
         }
 
         static void OnSpawnsAvatar(PlayerEvent playerEvent)
         {
             GUIActive = true;
             // Create GUI
-            _canvas = Object.FindObjectOfType<Canvas>();
-            GO = new GameObject("HackPanel", typeof(RectTransform), typeof(CanvasGroup))
+            _uiCanvas = UnityEngine.Object.FindObjectOfType<Canvas>();
+            _gameObjectPanel = new GameObject("HackPanel", typeof(RectTransform), typeof(CanvasGroup))
             {
-                name = $"{UnderCheatBase.modGUID}.HackUI"
+                name = $"{UnderCheatBase.ModGuid}.HackUI"
             };
-            GO.transform.SetParent(_canvas.transform);
+            _gameObjectPanel.transform.SetParent(_uiCanvas.transform);
 
-            RT = GO.GetComponent<RectTransform>();
-            RT.sizeDelta = new Vector2(200, 100);
-            RT.anchoredPosition3D = _restPosition + _restPositionOffset;
-            RT.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+            _rectPanel = _gameObjectPanel.GetComponent<RectTransform>();
+            _rectPanel.sizeDelta = new Vector2(200, 100);
+            _rectPanel.anchoredPosition3D = RestPosition + RestPositionOffset;
+            _rectPanel.localScale = new Vector3(1.5f, 1.5f, 1.5f);
 
             // Create Text
-            textGO = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
-            textGO.transform.SetParent(GO.transform, false);
+            _gameObjectText = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
+            _gameObjectText.transform.SetParent(_gameObjectPanel.transform, false);
 
-            TMP = textGO.GetComponent<TextMeshProUGUI>();
-            TMP.text = "";
-            TMP.font = UnderCheatBase.fontAsset;
-            TMP.fontSize = 16;
-            TMP.color = Color.white;
-            TMP.alignment = (TextAlignmentOptions)TextAnchor.UpperLeft;
+            _textPanel = _gameObjectText.GetComponent<TextMeshProUGUI>();
+            _textPanel.text = "";
+            _textPanel.font = UnderCheatBase.FontAsset;
+            _textPanel.fontSize = 16;
+            _textPanel.color = Color.white;
+            _textPanel.alignment = (TextAlignmentOptions)TextAnchor.UpperLeft;
 
             // Show GUI
-            Debug.Log($"{UnderCheatBase.modGUID}: Showing GUI");
-            API.current_page = 1;
-            API.discover_tab_item_index = 0;
+            Debug.Log($"{UnderCheatBase.ModGuid}: Showing GUI");
+            API.CurrentPage = 1;
+            API.DiscoverTabItemIndex = 0;
             UpdateText();
 
             // Resource Add Amount Variables
@@ -244,13 +249,13 @@ namespace UnderCheat.UI
         private static void OnDestroysAvatar(PlayerEvent playerEvent)
         {
             // Delete GUI
-            Object.Destroy(GO);
-            GO = null;
-            RT = null;
-            API.current_page = 1;
+            UnityEngine.Object.Destroy(_gameObjectPanel);
+            _gameObjectPanel = null;
+            _rectPanel = null;
+            API.CurrentPage = 1;
             GUIActive = false;
             Hidden = false;
-            Debug.Log($"{UnderCheatBase.modGUID}: Hiding GUI");
+            Debug.Log($"{UnderCheatBase.ModGuid}: Hiding GUI");
         }
 
         [HarmonyPatch(typeof(HUD))]
@@ -260,10 +265,10 @@ namespace UnderCheat.UI
         {
             foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
             {
-                Debug.Log($"{UnderCheatBase.modGUID}: Creating UI Events");
+                Debug.Log($"{UnderCheatBase.ModGuid}: Creating UI Events");
                 player.RegisterEvent(PlayerEvent.EventType.SpawnsAvatar, OnSpawnsAvatar);
                 player.RegisterEvent(PlayerEvent.EventType.DestroysAvatar, OnDestroysAvatar);
-                Debug.Log($"{UnderCheatBase.modGUID}: Done Creating UI Events");
+                Debug.Log($"{UnderCheatBase.ModGuid}: Done Creating UI Events");
             }
         }
     }

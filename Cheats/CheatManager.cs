@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using HarmonyLib;
 using Rewired;
 using Thor;
@@ -11,8 +11,8 @@ namespace UnderCheat.Cheats
     [HarmonyPatch(typeof(Game))]
     internal class CheatManager
     {
-        public static bool playerReducingDamage;
-        static Simulation _sim;
+        public static bool PlayerReducingDamage;
+        private static Simulation _sim;
 
         static List<KeyCode> keyList = new List<KeyCode> {
             KeyCode.T,
@@ -39,7 +39,7 @@ namespace UnderCheat.Cheats
 
             if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F1))
             {
-                API.current_page = API.next_page();
+                API.CurrentPage = API.next_page();
             }
 
             bool cheatKeyDown = false;
@@ -55,14 +55,14 @@ namespace UnderCheat.Cheats
             if (!cheatKeyDown) return;
             
             HUDControl.UpdateText();
-            switch (API.current_page)
+            switch (API.CurrentPage)
             {
                 case 1:
 
                     if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F2))
                     {
-                        playerReducingDamage = !playerReducingDamage;
-                        Debug.Log($"{UnderCheatBase.modGUID}: {(playerReducingDamage ? "Enabling" : "Disabling")} player damage reducer.");
+                        PlayerReducingDamage = !PlayerReducingDamage;
+                        Debug.Log($"{UnderCheatBase.ModGuid}: {(PlayerReducingDamage ? "Enabling" : "Disabling")} player damage reducer.");
                     }
 
                     if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F3))
@@ -87,12 +87,12 @@ namespace UnderCheat.Cheats
 
                     if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F7))
                     {
-                        UnderCheatBase.Instance.reloadConfig();
-                        Debug.Log($"{UnderCheatBase.modGUID}: Refreshing config...");
+                        UnderCheatBase.Instance.ReloadConfig();
+                        Debug.Log($"{UnderCheatBase.ModGuid}: Refreshing config...");
                     }
-                    if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F8))
+                    if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F8) && !API.IsProton)
                     {
-                        ConfigOpener.OpenConfig($"{UnderCheatBase.modGUID}.cfg");
+                        ConfigOpener.OpenConfig($"{UnderCheatBase.ModGuid}.cfg");
                     }
 
                     break;
@@ -135,35 +135,33 @@ namespace UnderCheat.Cheats
 
                     if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F2))
                     {
-                        API.discover_tab_item_index = API.wrap_index(API.discover_tab_item_index - 1, API.Data.RelicCollection.Count);
+                        API.DiscoverTabItemIndex = API.wrap_index(API.DiscoverTabItemIndex - 1, API.Data.RelicCollection.Count);
                     }
 
                     if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F3))
                     {
-                        API.discover_tab_item_index = API.wrap_index(API.discover_tab_item_index + 1, API.Data.RelicCollection.Count);
+                        API.DiscoverTabItemIndex = API.wrap_index(API.DiscoverTabItemIndex + 1, API.Data.RelicCollection.Count);
                     }
 
                     if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F4))
                     {
-                        var item = API.GetItemDataIndex(API.discover_tab_item_index);
-                        if (item is ItemData itemData)
+                        var item = API.GetItemDataIndex(API.DiscoverTabItemIndex);
+                        if (!(item is ItemData itemData)) { break; }
+                        
+                        foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
                         {
-                            foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
-                            {
-                                GameData.Instance.Discover(itemData);
-                            }
+                            GameData.Instance.Discover(itemData);
                         }
                     }
 
                     if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F5))
                     {
-                        var item = API.GetItemDataIndex(API.discover_tab_item_index);
-                        if (item is ItemData itemData)
+                        var item = API.GetItemDataIndex(API.DiscoverTabItemIndex);
+                        if (!(item is ItemData itemData)) { break; }
+                        
+                        foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
                         {
-                            foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
-                            {
-                                Entity relic = API.SpawnRelic(itemData, player.Avatar.Position);
-                            }
+                            Entity relic = API.SpawnRelic(itemData, player.Avatar.Position);
                         }
                     }
 
@@ -174,12 +172,11 @@ namespace UnderCheat.Cheats
                         var relics = API.Data.RelicCollection;
                         int index = rand.Next(relics.Count);
                         var randomItem = relics[index];
-                        if (randomItem is ItemData itemData)
+                        if (!(randomItem is ItemData itemData)) { break; }
+
+                        foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
                         {
-                            foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
-                            {
-                                Entity relic = API.SpawnRelic(itemData, player.Avatar.Position);
-                            }
+                            Entity relic = API.SpawnRelic(itemData, player.Avatar.Position);
                         }
                     }
 
@@ -204,10 +201,10 @@ namespace UnderCheat.Cheats
                         bool succeeded = ModifyCurses(removeCurse, curseType);
                         if (succeeded)
                         {
-                            Debug.Log($"{UnderCheatBase.modGUID}: Successfully added {curseType} curse to player.");
+                            Debug.Log($"{UnderCheatBase.ModGuid}: Successfully added {curseType} curse to player.");
                         } else
                         {
-                            Debug.LogError($"{UnderCheatBase.modGUID}: Failed to add {curseType} curse to player.");
+                            Debug.LogError($"{UnderCheatBase.ModGuid}: Failed to add {curseType} curse to player.");
                         }
                     }
 
@@ -218,11 +215,11 @@ namespace UnderCheat.Cheats
                         bool succeeded = ModifyCurses(removeCurse, curseType);
                         if (succeeded)
                         {
-                            Debug.Log($"{UnderCheatBase.modGUID}: Successfully removed {curseType} curse to player.");
+                            Debug.Log($"{UnderCheatBase.ModGuid}: Successfully removed {curseType} curse to player.");
                         }
                         else
                         {
-                            Debug.LogError($"{UnderCheatBase.modGUID}: Failed to remove {curseType} curse to player.");
+                            Debug.LogError($"{UnderCheatBase.ModGuid}: Failed to remove {curseType} curse to player.");
                         }
                     }
 
@@ -233,11 +230,11 @@ namespace UnderCheat.Cheats
                         bool succeeded = ModifyCurses(removeCurse, curseType);
                         if (succeeded)
                         {
-                            Debug.Log($"{UnderCheatBase.modGUID}: Successfully added {curseType} curse to player.");
+                            Debug.Log($"{UnderCheatBase.ModGuid}: Successfully added {curseType} curse to player.");
                         }
                         else
                         {
-                            Debug.LogError($"{UnderCheatBase.modGUID}: Failed to add {curseType} curse to player.");
+                            Debug.LogError($"{UnderCheatBase.ModGuid}: Failed to add {curseType} curse to player.");
                         }
                     }
 
@@ -248,11 +245,11 @@ namespace UnderCheat.Cheats
                         bool succeeded = ModifyCurses(removeCurse, curseType);
                         if (succeeded)
                         {
-                            Debug.Log($"{UnderCheatBase.modGUID}: Succesfully removed {curseType} curse to player.");
+                            Debug.Log($"{UnderCheatBase.ModGuid}: Succesfully removed {curseType} curse to player.");
                         }
                         else
                         {
-                            Debug.LogError($"{UnderCheatBase.modGUID}: Failed to remove {curseType} curse to player.");
+                            Debug.LogError($"{UnderCheatBase.ModGuid}: Failed to remove {curseType} curse to player.");
                         }
                     }
                     break;
@@ -303,7 +300,7 @@ namespace UnderCheat.Cheats
             }
         }
 
-        static bool ModifyCurses(bool RemoveCurse, HealthExt.CurseType curseType)
+        static bool ModifyCurses(bool removeCurse, HealthExt.CurseType curseType)
         {
             foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
             {
@@ -311,7 +308,7 @@ namespace UnderCheat.Cheats
                 
                 HealthExt healthExt = player.Avatar.GetExtension<HealthExt>();
 
-                if (RemoveCurse)
+                if (removeCurse)
                 {
                     Entity curseEntity;
                     healthExt.RemoveRandomCurse(curseType, out curseEntity);
@@ -327,7 +324,7 @@ namespace UnderCheat.Cheats
 
         static void SummonAllRelics(bool discoveredAndUnlockedOnly)
         {
-            Debug.Log($"{UnderCheatBase.modGUID}: Attempting to spawn all {(discoveredAndUnlockedOnly ? "discovered" : "")} relics.");
+            Debug.Log($"{UnderCheatBase.ModGuid}: Attempting to spawn all {(discoveredAndUnlockedOnly ? "discovered" : "")} relics.");
             int spawnedRelicCount = 0;
             foreach (var item in API.Data.RelicCollection)
             {
@@ -353,19 +350,19 @@ namespace UnderCheat.Cheats
                     SpawnRelic();
                 }
             }
-            Debug.Log($"{UnderCheatBase.modGUID}: Successfully spawned {spawnedRelicCount} relics.");
+            Debug.Log($"{UnderCheatBase.ModGuid}: Successfully spawned {spawnedRelicCount} relics.");
         }
 
         static void ToggleDoors()
         {
             if (Game.Instance.Simulation.Zone.CurrentRoom.DoorState == Room.DoorStateType.Open)
             {
-                Debug.Log($"{UnderCheatBase.modGUID}: Closing Doors");
+                Debug.Log($"{UnderCheatBase.ModGuid}: Closing Doors");
                 Game.Instance.Simulation.Zone.CurrentRoom.CloseDoors();
             }
             else
             {
-                Debug.Log($"{UnderCheatBase.modGUID}: Opening Doors");
+                Debug.Log($"{UnderCheatBase.ModGuid}: Opening Doors");
                 Game.Instance.Simulation.Zone.CurrentRoom.OpenDoors();
             }
         }
@@ -378,7 +375,7 @@ namespace UnderCheat.Cheats
                 GameData.Instance.Discover((DataObject)itemData);
             }
 
-            Debug.Log($"{UnderCheatBase.modGUID}: Unlocking All Items");
+            Debug.Log($"{UnderCheatBase.ModGuid}: Unlocking All Items");
         }
 
         static void AddResource(ResourceData resource, int changeInt)
@@ -400,7 +397,7 @@ namespace UnderCheat.Cheats
                     };
 
                     extension.ChangeResource(resource, changeInt, (List<string>)null, false, (Entity)null);
-                    Debug.Log($"{UnderCheatBase.modGUID}: Attempted to change `{resourceDict[resource]}` by {changeInt} from {extension.GetResource(resource) - changeInt} to {extension.GetResource(resource)}");
+                    Debug.Log($"{UnderCheatBase.ModGuid}: Attempted to change `{resourceDict[resource]}` by {changeInt} from {extension.GetResource(resource) - changeInt} to {extension.GetResource(resource)}");
                 }
         }
         static void MaxPetLevel()
@@ -419,7 +416,7 @@ namespace UnderCheat.Cheats
                 {
                     extension2.ChangeResource(GameData.Instance.XPResource, extension2.GetMaxResource(GameData.Instance.XPResource) - extension2.GetResource(GameData.Instance.XPResource), (List<string>)null, false, (Entity)null);
                 }
-                Debug.Log($"{UnderCheatBase.modGUID}: Set pet's level to max");
+                Debug.Log($"{UnderCheatBase.ModGuid}: Set pet's level to max");
             }
         }
 
