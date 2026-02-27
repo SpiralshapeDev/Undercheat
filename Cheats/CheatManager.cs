@@ -8,13 +8,12 @@ using UnityEngine;
 
 namespace UnderCheat.Cheats
 {
-    [HarmonyPatch(typeof(Game))]
     internal class CheatManager
     {
         public static bool PlayerReducingDamage;
         private static Simulation _sim;
 
-        static List<KeyCode> keyList = new List<KeyCode> {
+        static readonly List<KeyCode> KeyList = new List<KeyCode> {
             KeyCode.T,
             KeyCode.F1,
             KeyCode.F2,
@@ -26,7 +25,8 @@ namespace UnderCheat.Cheats
             KeyCode.F8
         };
 
-        [HarmonyPatch("Update")]
+        [HarmonyPatch(typeof(Simulation))]
+        [HarmonyPatch("Process")]
         [HarmonyPostfix]
         static void Update()
         {
@@ -44,7 +44,7 @@ namespace UnderCheat.Cheats
 
             bool cheatKeyDown = false;
 
-            foreach(KeyCode key in keyList)
+            foreach(KeyCode key in KeyList)
             {
                 if (ReInput.controllers.Keyboard.GetKeyDown(key))
                 {
@@ -148,10 +148,7 @@ namespace UnderCheat.Cheats
                         var item = API.GetItemDataIndex(API.DiscoverTabItemIndex);
                         if (!(item is ItemData itemData)) { break; }
                         
-                        foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
-                        {
-                            GameData.Instance.Discover(itemData);
-                        }
+                        GameData.Instance.Discover(itemData);
                     }
 
                     if (ReInput.controllers.Keyboard.GetKeyDown(KeyCode.F5))
@@ -161,7 +158,7 @@ namespace UnderCheat.Cheats
                         
                         foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
                         {
-                            Entity relic = API.SpawnRelic(itemData, player.Avatar.Position);
+                            API.SpawnRelic(itemData, player.Avatar.Position);
                         }
                     }
 
@@ -176,7 +173,7 @@ namespace UnderCheat.Cheats
 
                         foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
                         {
-                            Entity relic = API.SpawnRelic(itemData, player.Avatar.Position);
+                            API.SpawnRelic(itemData, player.Avatar.Position);
                         }
                     }
 
@@ -261,7 +258,7 @@ namespace UnderCheat.Cheats
         {
             foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
             {
-                if (!(UnityEngine.Object)player.Avatar) break;
+                if (player.Avatar == null) break;
                 
                 if (player.Avatar.HasModifier("CheatMeleeDamage"))
                 {
@@ -304,7 +301,7 @@ namespace UnderCheat.Cheats
         {
             foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
             {
-                if (!(UnityEngine.Object)player.Avatar) break;
+                if (player.Avatar == null) break;
                 
                 HealthExt healthExt = player.Avatar.GetExtension<HealthExt>();
 
@@ -334,7 +331,7 @@ namespace UnderCheat.Cheats
                 {
                     foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
                     {
-                        Entity relic = API.SpawnRelic(itemData, player.Avatar.Position);
+                        API.SpawnRelic(itemData, player.Avatar.Position);
                         spawnedRelicCount++;
                     }
                 }

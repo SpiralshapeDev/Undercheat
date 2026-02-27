@@ -76,8 +76,8 @@ namespace UnderCheat
             UnderCheatBase.ThoriumAmountAdd = this.Config.Bind<int>("Settings", "Amount of Thorium added", 10, "Changes the amount of thorium given in the resource cheat.");
             UnderCheatBase.NetherAmountAdd = this.Config.Bind<int>("Settings", "Amount of Nether added", 1, "Changes the amount of nether given in the resource cheat.");
             UnderCheatBase.DamageReduceHackPercentage = this.Config.Bind<float>("Settings", "Percentage of damage reduced", 100, "Amount of damage reduced in damage reducing hack.");
-            UnderCheatBase.DamageBoostAmount = this.Config.Bind<float>("Settings", "Damage Boost Amount", 999, "Amount of damage added in damage boosting hack.");
-            UnderCheatBase.DamageAttackSpeed = this.Config.Bind<float>("Settings", "Attack Speed Boost Amount", 2, "(default ingame is 1) Range (0.1 to 5) Attack speed in damage boosting hack.");
+            UnderCheatBase.DamageBoostAmount = this.Config.Bind<float>("Settings", "Damage Boost Amount", 9999, "Amount of damage added in damage boosting hack.");
+            UnderCheatBase.DamageAttackSpeed = this.Config.Bind<float>("Settings", "Attack Speed Boost Amount", 3, "(default ingame is 1) Range (0.1 to 5) Attack speed in damage boosting hack.");
             LogConfig();
         }
 
@@ -92,11 +92,6 @@ namespace UnderCheat
             Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Config for damage reduce percentage, Value: '{UnderCheatBase.DamageReduceHackPercentage.Value}%'");
             Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Config for damage boost hack, Value: '{UnderCheatBase.DamageBoostAmount.Value}'");
             Debug.Log($"{UnderCheatBase.ModGuid}: Loaded Config for attack speed boost amount, Value: '{UnderCheatBase.DamageBoostAmount.Value}'");
-        }
-
-        void Update()
-        {
-            HUDControl.Update();
         }
 
         public void ReloadConfig()

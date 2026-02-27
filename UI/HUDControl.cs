@@ -34,6 +34,7 @@ namespace UnderCheat.UI
             if (!_gameObjectPanel) { return; }
             if (!_gameObjectText) { return; }
             if (!_textPanel) { return; }
+            if (!_rectPanel) { return; }
 
             string nextPageText = $"Next page ({Undercheat.API.next_page()})";
             string configText;
@@ -171,11 +172,16 @@ namespace UnderCheat.UI
                     break;
             }
         }
-
+        
+        [HarmonyPatch(typeof(Simulation))]
+        [HarmonyPatch("Process")]
+        [HarmonyPostfix]
         public static void Update()
         {
-            if (!_gameObjectText) { return; }
-            if (!_textPanel) { return; }
+            if (!GUIActive) return;
+
+            if (_gameObjectPanel == null || _textPanel == null || _rectPanel == null)
+                return;
 
             if (!Mathf.Approximately(Mathf.Round(_rectPanel.anchoredPosition3D.x), Mathf.Round(RestPosition.x)))
             {
@@ -188,8 +194,10 @@ namespace UnderCheat.UI
 
             foreach (SimulationPlayer player in Game.Instance.Simulation.Players)
             {
-                if (!(UnityEngine.Object)player.Avatar) break;
+                if (player.Avatar == null) break;
+                
                 InventoryExt extension2 = player.Avatar.GetExtension<InventoryExt>();
+                if (extension2 == null) break;
 
                 bool keyMismatched = extension2.GetResource(GameData.Instance.KeyResource) != _keyAmount;
                 bool bombMismatched = extension2.GetResource(GameData.Instance.KeyResource) != _bombAmount;
@@ -254,7 +262,6 @@ namespace UnderCheat.UI
             _rectPanel = null;
             API.CurrentPage = 1;
             GUIActive = false;
-            Hidden = false;
             Debug.Log($"{UnderCheatBase.ModGuid}: Hiding GUI");
         }
 

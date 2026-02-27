@@ -2,7 +2,6 @@ using BepInEx;
 using System.Diagnostics;
 using System;
 using System.IO;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace UnderCheat
