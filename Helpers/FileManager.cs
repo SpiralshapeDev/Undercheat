@@ -1,28 +1,23 @@
-using BepInEx;
-using System.Diagnostics;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using BepInEx;
 
-namespace UnderCheat
+namespace UnderCheat.Helpers
 {
-    public static class ConfigOpener
+    public static class FileManager
     {
+        public static readonly bool isProton = Paths.ConfigPath.Contains("Z:\\");
+        
         public static void OpenConfig(string configFileName)
         {
             string configPath = Path.Combine(Paths.ConfigPath, configFileName);
-
-            if (!File.Exists(configPath))
-            {
-                UnityEngine.Debug.LogError($"{UnderCheatBase.ModGuid}: Config file not found at {configPath}");
-                return;
-            }
-
+            
             try
             {
                 UnityEngine.Debug.Log($"Opening config file {configPath}");
                 bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-                
                 bool isMac = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
                 
                 if (isWindows)
@@ -33,13 +28,11 @@ namespace UnderCheat
                         FileName = configPath,
                         UseShellExecute = true
                     });
-                }
-                else if (isMac)
+                } else if (isMac)
                 {
                     UnityEngine.Debug.Log("Detected Mac-OS, attempting to open config");
                     Process.Start("open", configPath);
-                }
-                else
+                } else
                 {
                     UnityEngine.Debug.Log("Detected Unix-like OS, attempting to open config");
                     Process.Start(new ProcessStartInfo
