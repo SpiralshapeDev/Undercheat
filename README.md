@@ -1,10 +1,10 @@
-# Toggle Enemies
+# UnderCheat
 
 [Apache License, Version 2.0]: https://github.com/SpiralShapeDev/Undercheat/blob/master/LICENSE-APACHE
 [Bepinex pack for Undermine]: https://www.nexusmods.com/undermine/mods/5
 
 ## License
-BlueTui is released under the [Apache License, Version 2.0].
+UnderCheat is released under the [Apache License, Version 2.0].
 
 ### Requirements
 - [Bepinex pack for Undermine]
