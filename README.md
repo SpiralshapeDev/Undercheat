@@ -3,6 +3,8 @@
 [Apache License, Version 2.0]: https://github.com/SpiralShapeDev/Undercheat/blob/master/LICENSE-APACHE
 [Bepinex pack for Undermine]: https://www.nexusmods.com/undermine/mods/5
 
+This mod exposes cheat functionality that was already built into the game. The cheat GUI in this mod contains 4 pages of cheats.
+
 ## License
 UnderCheat is released under the [Apache License, Version 2.0].
 
