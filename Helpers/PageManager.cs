@@ -1,6 +1,6 @@
 namespace UnderCheat.Helpers
 {
-    public static class PageManager
+    internal static class PageManager
     {
         public static int currentPage = 1;
         private static readonly int maxPage = 4; 
@@ -21,7 +21,6 @@ namespace UnderCheat.Helpers
         public static int WrapIndex(int index, int minIndex, int maxIndex)
         {
             if (index < minIndex) return maxIndex;
-            
             if (index > maxIndex) return minIndex;
             
             return index;

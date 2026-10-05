@@ -47,6 +47,8 @@
       <Reference Include="UnityEngine.UIModule">
         <HintPath>.lib\UnityEngine.UIModule.dll</HintPath>
       </Reference>
+      <Reference Include="KeybindLib">
+        <HintPath>.lib\KeybindLib.dll</HintPath>
+      </Reference>
     </ItemGroup>
-
 </Project>

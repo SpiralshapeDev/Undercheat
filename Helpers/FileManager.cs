@@ -6,7 +6,7 @@ using BepInEx;
 
 namespace UnderCheat.Helpers
 {
-    public static class FileManager
+    internal static class FileManager
     {
         public static readonly bool isProton = Paths.ConfigPath.Contains("Z:\\");
         
